@@ -43,7 +43,7 @@ function App() {
 		const handleResize = () => {
 			update100VhToExcludeScrollbarThickness();
 		};
-
+		handleResize();
 		window.addEventListener("resize", handleResize);
 
 		let ctx = c.current.getContext("2d");
