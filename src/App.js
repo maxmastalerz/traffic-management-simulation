@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import './App.css';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -37,12 +37,13 @@ function App() {
 		}
 	}
 
-	const handleResize = () => {
-		update100VhToExcludeScrollbarThickness();
-	};
+
 
 	useEffect(() => {
-		handleResize();
+		const handleResize = () => {
+			update100VhToExcludeScrollbarThickness();
+		};
+
 		window.addEventListener("resize", handleResize);
 
 		let ctx = c.current.getContext("2d");
