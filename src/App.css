@@ -1,38 +1,20 @@
-.App {
-  text-align: center;
+body {
+  min-width: 768px; /*Smallest body maintains 16:9 ratio, most common screen ratio.*/
+  min-height: 432px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+#simulation-row-1 {
+  height: 100px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+#simulation-row-2 {
+  min-height: calc(432px - 100px);
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/*Due to body min-width, smallest possible width of canvas is ((768*(10/12)) - 8(aka0.5Rem)) * (9/12) = 474px */
+/*The smallest possible height is 266.63px as that's 9/16th of 474px.*/
+canvas#simulation {
+  width: 100%;
+  aspect-ratio: 16/9;
+  vertical-align: bottom;
 }
