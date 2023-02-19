@@ -6,18 +6,21 @@ import {
 const materials = [
 	new MeshBasicMaterial( {color: 0xA8FF93, side: DoubleSide} ), //light box
 	new MeshBasicMaterial( {color: 0x8AFC6E, side: DoubleSide} ), //darker box
-	new MeshBasicMaterial( {color: 0x807E78, side: DoubleSide} ) //asphalt grey road
+	new MeshBasicMaterial( {color: 0x807E78, side: DoubleSide} ), //asphalt grey road
+	new LineBasicMaterial( { color: 0xff0000 } ), // Red line
+	new LineBasicMaterial( { color: 0x00ff00 } ), // Green line
+	new LineBasicMaterial( { color: 0x0000ff } ), // Blue line
 ];
 
 function drawStorageBayTaperAndMissingBg(scene, rotationOnZAxis) {
 	//the storage bay starts (Math.sqrt(2)-1 earlier to make diagonal lane remain at 1 unit of width
-	const x = -0.5, y = 5.5+(Math.sqrt(2)-1); //Default start position for drawing the tile
+	const x = -5.5-(Math.sqrt(2)-1), y = -0.5; //Default start position for drawing the tile
 
 	//Fill in missing background:
 	const missingBg = new Shape();
 	missingBg.moveTo( x, y );
-	missingBg.bezierCurveTo(x,y-0.5,x+1,y-0.5,x+1,y-1);
-	missingBg.lineTo( x+1, y );
+	missingBg.bezierCurveTo(x+0.5,y,x+0.5,y+1,x+1,y+1);
+	missingBg.lineTo( x, y+1 );
 
 	const missingBgTriangleGeometry = new ShapeGeometry( missingBg );
 	const missingBgMesh = new Mesh( missingBgTriangleGeometry, materials[0] ) ;
@@ -28,8 +31,8 @@ function drawStorageBayTaperAndMissingBg(scene, rotationOnZAxis) {
 	//Storage Bay Taper:
 	const storageBayTaper = new Shape();
 	storageBayTaper.moveTo( x, y );
-	storageBayTaper.bezierCurveTo(x,y-0.5,x+1,y-0.5,x+1,y-1);
-	storageBayTaper.lineTo( x, y-1 );
+	storageBayTaper.bezierCurveTo(x+0.5,y,x+0.5,y+1,x+1,y+1);
+	storageBayTaper.lineTo( x+1, y );
 
 	const storageBayTaperTriangleGeometry = new ShapeGeometry( storageBayTaper );
 	const storageBayTaperMesh = new Mesh( storageBayTaperTriangleGeometry, materials[2] ) ;
@@ -39,10 +42,10 @@ function drawStorageBayTaperAndMissingBg(scene, rotationOnZAxis) {
 
 	//Storage Bay Taper missing road piece
 	const storageBayTaperMissingRoad = new Shape();
-	storageBayTaperMissingRoad.moveTo( x, y-1 );
-	storageBayTaperMissingRoad.lineTo( x+1, y-1 );
-	storageBayTaperMissingRoad.lineTo( x+1, y-1-(Math.sqrt(2)-1) );
-	storageBayTaperMissingRoad.lineTo( x, y-1-(Math.sqrt(2)-1) );
+	storageBayTaperMissingRoad.moveTo( x+1, y );
+	storageBayTaperMissingRoad.lineTo( x+1, y+1 );
+	storageBayTaperMissingRoad.lineTo( x+1+(Math.sqrt(2)-1), y+1 );
+	storageBayTaperMissingRoad.lineTo( x+1+(Math.sqrt(2)-1), y );
 
 	const storageBayTaperMissingRoadGeometry = new ShapeGeometry( storageBayTaperMissingRoad );
 	const storageBayTaperMissingRoadMesh = new Mesh( storageBayTaperMissingRoadGeometry, materials[2] ) ;
@@ -87,23 +90,63 @@ function drawBg(scene, WorldSpaceWidth, WorldSpaceHeight) {
 	}
 }
 
-function drawCurves(scene, WorldSpaceWidth, WorldSpaceHeight) {
+function Path(obj) {
+	this.id = obj.id;
+	this.path = obj.path;
+	this.cars = obj.cars;
+	this.possiblePaths = obj.possiblePaths;
+	this.pathFull = function() {
+		//some logic.
+		//maybe take into account distance of line?
+	}
+}
 
-	const curve = new CubicBezierCurve(
+function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
+	let paths = [];
+
+	//1
+	const points1 = [];
+	points1.push( new Vector3( 0 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 ) );
+	points1.push( new Vector3( 5 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 ) );
+	const geometry1 = new BufferGeometry().setFromPoints( points1 );
+	const path1 = new Line( geometry1, materials[3] );
+	paths.push(new Path({
+		id: 1,
+		path: path1
+	}));
+
+
+	//2
+	const curve2 = new CubicBezierCurve(
 		new Vector2( 5 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2) ),
 		new Vector2( 5.5 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2) ),
 		new Vector2( 5.5 -(WorldSpaceWidth/2), -7.5 +(WorldSpaceHeight/2) ),
 		new Vector2( 6 -(WorldSpaceWidth/2), -7.5 +(WorldSpaceHeight/2) )
 	);
+	var points2 = curve2.getSpacedPoints(50);
+	const geometry2 = new BufferGeometry().setFromPoints( points2 );
+	const path2 = new Line( geometry2, materials[4] );
+	paths.push(new Path({
+		id: 2,
+		path: path2
+	}));
 
-	var points = curve.getSpacedPoints(50);
-	const geometry = new BufferGeometry().setFromPoints( points );
-	const material = new LineBasicMaterial( { color: 0xff0000 } );
+	//6
+	const points6 = [];
+	points6.push( new Vector3( 5 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 ) );
+	points6.push( new Vector3( 9 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 ) );
+	const geometry6 = new BufferGeometry().setFromPoints( points6 );
+	const path6 = new Line( geometry6, materials[5] );
+	paths.push(new Path({
+		id: 6,
+		path: path6
+	}));
 
-	// Create the final object to add to the scene
-	const curveObject = new Line( geometry, material );
-	scene.add(curveObject);
+	//Display paths in scene
+	paths.forEach((pathObj) => {
+		scene.add(pathObj.path);
+	})
 }
 
-let obj = { drawBg, drawCurves };
+let obj = { drawBg, drawPaths };
 export default obj;

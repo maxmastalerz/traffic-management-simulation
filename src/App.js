@@ -75,7 +75,7 @@ function App() {
 		renderer.setPixelRatio(window.devicePixelRatio);
 
 		drawings.drawBg(scene, WorldSpaceWidth, WorldSpaceHeight);
-		drawings.drawCurves(scene, WorldSpaceWidth, WorldSpaceHeight);
+		drawings.drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight);
 
 		const renderScene = () => {
 			renderer.render(scene, camera);
