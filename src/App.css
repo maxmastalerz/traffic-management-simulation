@@ -12,9 +12,11 @@ body {
 }
 
 /*Due to body min-width, smallest possible width of canvas is ((768*(10/12)) - 8(aka0.5Rem)) * (9/12) = 474px */
-/*The smallest possible height is 266.63px as that's 9/16th of 474px.*/
-canvas#simulation {
+/*The smallest possible height is 338.57px as that's 5/7th of 474px.*/
+#canvas-container {
   width: 100%;
-  aspect-ratio: 16/9;
-  vertical-align: bottom;
+  aspect-ratio: 7/5;
+  overflow: hidden;
+  /*Overflow: hidden; is a hack that let's me have the container scale downwards following the aspect-ratio with the canvas inside.
+  Will never overflow more than a px because js is constantly readjusting the canvas size to match the container*/
 }

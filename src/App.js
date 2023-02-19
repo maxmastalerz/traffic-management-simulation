@@ -1,29 +1,22 @@
 import { useEffect, useRef } from 'react';
+import { Scene, OrthographicCamera, WebGLRenderer /*, BoxGeometry, MeshBasicMaterial, Mesh*/ } from 'three';
+
 import './App.css';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
 import update100VhToExcludeScrollbar from "./js/vhFix";
+import drawings from "./js/drawings";
 
 function App() {
-	const canvasRef = useRef(null);
+	const mount = useRef(null);
 	const requestIdRef = useRef(null);
-	const ballRef = useRef({ x: 20, y: 20, vx: 0.2354, vy: 0.01197, radius: 20 }); //ball goes from 20-2374 instead of 0-2394
+	//const ballRef = useRef({ x: 20, y: 20, vx: 0.2354, radius: 20 }); //ball goes from 20-2374 instead of 0-2394
 	const startTime = useRef(undefined);
 	const prevTime = useRef(undefined);
-	const size = { width: 2394, height: 1346 };
 
-	function drawBg(size) {
-		this.save();
-		this.beginPath();
-		this.rect(0, 0, size.width, size.height);
-		this.fillStyle = "#009A17";
-		this.fill();
-		this.restore();
-	}
-
-	function drawBall(ball) {
+	/*function drawBall(ball) {
 		const drawCircle = (x, y, radius, color, alpha) => {
 			this.save();
 			this.beginPath();
@@ -36,77 +29,120 @@ function App() {
 		};
 
 		drawCircle(ball.x, ball.y, ball.radius, "#444");
-	}
+	}*/
 
-	const updateBallSinceLastFrame = (now, delta) => {
+	/*const updateBallSinceLastFrame = (now, delta) => {
 		const ball = ballRef.current;
-		console.log("ball.x+=" + ball.vx*delta);
+		//console.log("ball.x+=" + ball.vx*delta);
 		ball.x += ball.vx * delta;
 		if(Math.sign(ball.vx) === 1) {
 			ball.x = Math.min(ball.x, 2394-20);
 		} else {
 			ball.x = Math.max(ball.x, 20);
 		}
-		console.log("ball.x now is: "+ball.x);
-		//console.log("ball.x should really be "+(20+((now-startTime.current)*0.2374)));
-		//ball.y += ball.vy;
+		//console.log("ball.x now is: "+ball.x);
 		if (ball.x + ball.radius >= size.width) {
-			console.log("Hit wall at:"+(now-startTime.current));
+			//console.log("Hit wall at:"+(now-startTime.current));
 			ball.vx = -ball.vx;
 			ball.x = size.width - ball.radius;
 		}
 		if (ball.x - ball.radius <= 0) {
-			console.log("Hit wall at:"+(now-startTime.current));
+			//console.log("Hit wall at:"+(now-startTime.current));
 			ball.vx = -ball.vx;
 			ball.x = ball.radius;
 		}
-		/*if (ball.y + ball.radius >= size.height) {
-			ball.vy = -ball.vy;
-			ball.y = size.height - ball.radius;
-		}
-		if (ball.y - ball.radius <= 0) {
-			ball.vy = -ball.vy;
-			ball.y = ball.radius;
-		}*/
-	};
-
-	const tick = (now) => {
-		requestIdRef.current = requestAnimationFrame(tick);
-
-		if(startTime.current === undefined) {
-			startTime.current = now;
-		}
-		const deltaSinceLastFrame = (now - prevTime.current);
-		console.log("diff in time from last time frame: "+deltaSinceLastFrame);
-		console.log("time from 1st frame:"+(now-startTime.current))
-		
-		prevTime.current = now;
-		if(isNaN(deltaSinceLastFrame)) { // skip very first delta to prevent jumping
-			return;
-		}
-
-		if(!canvasRef.current) {
-			return;
-		}
-		const ctx = canvasRef.current.getContext("2d");
-
-		updateBallSinceLastFrame(now, deltaSinceLastFrame);
-		drawBg.call(ctx, size);
-		drawBall.call(ctx, ballRef.current);
-	};
+	};*/
 
 	useEffect(() => {
+		let mnt = mount.current;
+		let canvasCSSPixelWidth = mnt.clientWidth;
+    	let canvasCSSPixelHeight = mnt.clientHeight;
+    	const aspectRatio = canvasCSSPixelWidth/canvasCSSPixelHeight; // Will come out to 7/5 aspect ratio.
+
+    	// == Begin three.js set up ==
+    	const scene = new Scene();
+
+    	//Define orthographic frustum
+		const WorldSpaceHeight = 15; // aka the view size.
+		const WorldSpaceWidth = aspectRatio*WorldSpaceHeight;
+		const camera = new OrthographicCamera( WorldSpaceWidth/-2, WorldSpaceWidth/2, WorldSpaceHeight/2, WorldSpaceHeight/-2, 0, 1000);
+		camera.position.z = 1000; // Camera looks down the z axis in the negative(decreasing) direction.
+		
+		//Set up renderer
+		const renderer = new WebGLRenderer();
+		renderer.setClearColor('#dbdbdb'); //light grey
+		renderer.setSize(canvasCSSPixelWidth, canvasCSSPixelHeight);
+		renderer.setPixelRatio(window.devicePixelRatio);
+
+		drawings.drawBg(scene, WorldSpaceWidth, WorldSpaceHeight);
+		drawings.drawCurves(scene, WorldSpaceWidth, WorldSpaceHeight);
+
+		const renderScene = () => {
+			renderer.render(scene, camera);
+		}
+
 		const handleResize = () => {
+			canvasCSSPixelWidth = mnt.clientWidth;
+			canvasCSSPixelHeight = mnt.clientHeight;
+			renderer.setSize(canvasCSSPixelWidth, canvasCSSPixelHeight);
+			renderScene();
 			update100VhToExcludeScrollbar();
 		};
-		handleResize();
-		window.addEventListener("resize", handleResize);
 
-		requestIdRef.current = requestAnimationFrame(tick);
+		const tick = (now) => {
+			requestIdRef.current = requestAnimationFrame(tick);
+
+			if(startTime.current === undefined) {
+				startTime.current = now;
+			}
+			const deltaSinceLastFrame = (now - prevTime.current);
+			//console.log("diff in time from last time frame: "+deltaSinceLastFrame);
+			//console.log("time from 1st frame:"+(now-startTime.current))
+			
+			prevTime.current = now;
+			if(isNaN(deltaSinceLastFrame)) { // skip very first delta to prevent jumping
+				return;
+			}
+			
+			//updateBallSinceLastFrame(now, deltaSinceLastFrame);
+			//drawings.drawBg.call(ctx, size);
+			//drawings.drawCurves.call(ctx, scene, size);
+			//drawBall.call(ctx, ballRef.current);
+
+			//do updates to objects that are already in the scene
+
+			//cube.rotation.x += 0.01
+			//cube.rotation.y += 0.01
+			
+			renderScene();
+		};
+
+		const start = () => {
+			if(!requestIdRef.current) {
+				requestIdRef.current = requestAnimationFrame(tick);
+			}
+		}
+
+		update100VhToExcludeScrollbar();
+		
+		mnt.appendChild(renderer.domElement);
+		window.addEventListener("resize", handleResize);
+		start();
 
 		return () => {
-			window.removeEventListener('resize', handleResize);
 			cancelAnimationFrame(requestIdRef.current);
+			requestIdRef.current = null;
+
+			window.removeEventListener('resize', handleResize);
+
+			if (mnt) {
+				mnt.removeChild(renderer.domElement);
+			}
+			
+			//remove objects from scene
+			//scene.remove(something);
+			//geometry.dispose();
+			//material.dispose();
 		}
 	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -123,14 +159,7 @@ function App() {
 						<Row id="simulation-row-2" className="px-0 m-auto">
 							<Col xs={3} className="px-0">East/West Settings</Col>
 							<Col xs={9} className="px-0">
-								{/*
-								I decided on the resolution for the canvas using a resolution of 3840 wide(4K monitors).
-								Since the canvas doesn't take the whole space in the html, I made it smaller.
-
-								For width: ((3840 * (10/12)) - 8(aka1Rem)) * (9/12) = 2394
-								For height: 2394 * (9/16) = Math.floor(1346.625) = 1346
-								*/}
-								<canvas ref={canvasRef} id="simulation" width="2394" height="1346" ></canvas>
+								<div ref={mount} id="canvas-container"></div>
 							</Col>
 						</Row>
 					</Container>
