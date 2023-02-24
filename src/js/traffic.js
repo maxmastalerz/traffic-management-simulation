@@ -63,7 +63,9 @@ function Path(obj) {
 			let distanceToMoveThisFrame = (0.001*delta)/(this.curvePath.length);
 			let lastPosInCurve = 1;
 			let lastPossibleSpot = lastPosInCurve;
-			if(this.id === 6 || this.id === 3) { //For paths leading up to an intersection
+
+			//TODO: Implement intersection control somewhere.
+			if([3,6,13,16,23,26,33,36].includes(this.id)) { //For paths leading up to an intersection
 				lastPossibleSpot = 1-(oneUnitLength/2)+(oneUnitLength/10); // the +(oneUnitLength/10) pushes the car right up the intersection
 			}
 			

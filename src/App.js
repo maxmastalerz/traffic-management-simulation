@@ -39,23 +39,48 @@ function App() {
 
 		drawings.drawBg(scene, WorldSpaceWidth, WorldSpaceHeight);
 		let paths = drawings.drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight);
-		let path1 = paths.filter((obj) => obj.id===1)[0];
+		let sourcePathObjects = [
+			paths.filter((obj) => obj.id===1)[0],
+			paths.filter((obj) => obj.id===11)[0],
+			paths.filter((obj) => obj.id===21)[0],
+			paths.filter((obj) => obj.id===31)[0]
+		]
 
-		let carsToPlace = [
-			new traffic.Car({id: 5, desiredDir: 'e'}), //last car to appear
-			new traffic.Car({id: 4, desiredDir: 'n'}),
-			new traffic.Car({id: 3, desiredDir: 'e'}),
-			new traffic.Car({id: 2, desiredDir: 'n'}),
-			new traffic.Car({id: 1, desiredDir: 'n'}) //first car to appear
-		];
+		let carPlacements = [
+			[//will be placed on path 1
+				new traffic.Car({id: 3, desiredDir: 's'}), // last car to appear
+				new traffic.Car({id: 2, desiredDir: 'e'}),
+				new traffic.Car({id: 1, desiredDir: 'n'})  // first car to appear
+			],
+			[//will be placed on path 11
+				new traffic.Car({id: 6, desiredDir: 'w'}), // last car to appear
+				new traffic.Car({id: 5, desiredDir: 's'}),
+				new traffic.Car({id: 4, desiredDir: 'e'})  // first car to appear
+			],
+			[//will be placed on path 21
+				new traffic.Car({id: 9, desiredDir: 'n'}), // last car to appear
+				new traffic.Car({id: 8, desiredDir: 'w'}),
+				new traffic.Car({id: 7, desiredDir: 's'})  // first car to appear
+			],
+			[//will be placed on path 31
+				new traffic.Car({id: 12, desiredDir: 'e'}), // last car to appear
+				new traffic.Car({id: 11, desiredDir: 'n'}),
+				new traffic.Car({id: 10, desiredDir: 'w'})  // first car to appear
+			]
+		]
 
 		var keepTryingToPlaceCars = setInterval(() => {
-			if(carsToPlace.length > 0) {
-				if(path1.canPlaceCar()) {
-					path1.placeCarAtStart(scene, carsToPlace[carsToPlace.length-1]);
-					carsToPlace.pop(); // remove car from queue
+			for(let i=0;i<4;i++) {//for each of the cardinal directions
+				let carsToPlace = carPlacements[i];
+
+				if(carsToPlace.length > 0) {
+					if(sourcePathObjects[i].canPlaceCar()) {
+						sourcePathObjects[i].placeCarAtStart(scene, carsToPlace[carsToPlace.length-1]);
+						carsToPlace.pop(); // remove car from queue
+					}
 				}
-			} else { // all cars placed
+			}
+			if(carPlacements[0].length + carPlacements[1].length + carPlacements[2].length + carPlacements[3].length === 0) { // all cars placed
 				clearInterval(keepTryingToPlaceCars);
 			}
 		}, 1);
