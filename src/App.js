@@ -8,50 +8,13 @@ import Col from 'react-bootstrap/Col';
 
 import update100VhToExcludeScrollbar from "./js/vhFix";
 import drawings from "./js/drawings";
+import traffic from "./js/traffic";
 
 function App() {
 	const mount = useRef(null);
 	const requestIdRef = useRef(null);
-	//const ballRef = useRef({ x: 20, y: 20, vx: 0.2354, radius: 20 }); //ball goes from 20-2374 instead of 0-2394
 	const startTime = useRef(undefined);
 	const prevTime = useRef(undefined);
-
-	/*function drawBall(ball) {
-		const drawCircle = (x, y, radius, color, alpha) => {
-			this.save();
-			this.beginPath();
-			this.arc(x, y, radius, 0, Math.PI * 2);
-			this.fillStyle = color;
-			this.globalAlpha = alpha;
-			this.fill();
-			this.closePath();
-			this.restore();
-		};
-
-		drawCircle(ball.x, ball.y, ball.radius, "#444");
-	}*/
-
-	/*const updateBallSinceLastFrame = (now, delta) => {
-		const ball = ballRef.current;
-		//console.log("ball.x+=" + ball.vx*delta);
-		ball.x += ball.vx * delta;
-		if(Math.sign(ball.vx) === 1) {
-			ball.x = Math.min(ball.x, 2394-20);
-		} else {
-			ball.x = Math.max(ball.x, 20);
-		}
-		//console.log("ball.x now is: "+ball.x);
-		if (ball.x + ball.radius >= size.width) {
-			//console.log("Hit wall at:"+(now-startTime.current));
-			ball.vx = -ball.vx;
-			ball.x = size.width - ball.radius;
-		}
-		if (ball.x - ball.radius <= 0) {
-			//console.log("Hit wall at:"+(now-startTime.current));
-			ball.vx = -ball.vx;
-			ball.x = ball.radius;
-		}
-	};*/
 
 	useEffect(() => {
 		let mnt = mount.current;
@@ -75,7 +38,27 @@ function App() {
 		renderer.setPixelRatio(window.devicePixelRatio);
 
 		drawings.drawBg(scene, WorldSpaceWidth, WorldSpaceHeight);
-		drawings.drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight);
+		let paths = drawings.drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight);
+		let path1 = paths.filter((obj) => obj.id===1)[0];
+
+		let carsToPlace = [
+			new traffic.Car({id: 5, desiredDir: 'e'}), //last car to appear
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Car({id: 3, desiredDir: 'e'}),
+			new traffic.Car({id: 2, desiredDir: 'n'}),
+			new traffic.Car({id: 1, desiredDir: 'e'}) //first car to appear
+		];
+
+		var keepTryingToPlaceCars = setInterval(() => {
+			if(carsToPlace.length > 0) {
+				if(path1.canPlaceCar()) {
+					path1.placeCarAtStart(scene, carsToPlace[carsToPlace.length-1]);
+					carsToPlace.pop(); // remove car from queue
+				}
+			} else { // all cars placed
+				clearInterval(keepTryingToPlaceCars);
+			}
+		}, 1);
 
 		const renderScene = () => {
 			renderer.render(scene, camera);
@@ -95,24 +78,16 @@ function App() {
 			if(startTime.current === undefined) {
 				startTime.current = now;
 			}
-			const deltaSinceLastFrame = (now - prevTime.current);
-			//console.log("diff in time from last time frame: "+deltaSinceLastFrame);
+			const delta = (now - prevTime.current);
+			//console.log("diff in time from last time frame: "+delta);
 			//console.log("time from 1st frame:"+(now-startTime.current))
 			
 			prevTime.current = now;
-			if(isNaN(deltaSinceLastFrame)) { // skip very first delta to prevent jumping
+			if(isNaN(delta)) { // skip very first delta to prevent jumping
 				return;
 			}
-			
-			//updateBallSinceLastFrame(now, deltaSinceLastFrame);
-			//drawings.drawBg.call(ctx, size);
-			//drawings.drawCurves.call(ctx, scene, size);
-			//drawBall.call(ctx, ballRef.current);
 
-			//do updates to objects that are already in the scene
-
-			//cube.rotation.x += 0.01
-			//cube.rotation.y += 0.01
+			traffic.progressCars(paths, scene, delta);
 			
 			renderScene();
 		};
@@ -126,6 +101,15 @@ function App() {
 		update100VhToExcludeScrollbar();
 		
 		mnt.appendChild(renderer.domElement);
+
+		renderer.domElement.addEventListener('webglcontextlost', function (event) {
+			console.log('webgl context lost');
+			event.preventDefault();
+			setTimeout(function () {
+				console.log("RESTORING context");
+				renderer.forceContextRestore();
+			}, 1);
+		}, false);
 		window.addEventListener("resize", handleResize);
 		start();
 

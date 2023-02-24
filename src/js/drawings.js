@@ -1,7 +1,8 @@
 import {
-	PlaneGeometry, MeshBasicMaterial, DoubleSide, Mesh, Shape, ShapeGeometry, Vector3,
-	CubicBezierCurve, Vector2, BufferGeometry, Line, LineBasicMaterial
+	PlaneGeometry, MeshBasicMaterial, DoubleSide, Mesh, Shape, ShapeGeometry, Vector3, CurvePath, CubicBezierCurve3, LineCurve3,
+	BufferGeometry, Line, LineBasicMaterial
 } from 'three';
+import traffic from "./traffic";
 
 const materials = [
 	new MeshBasicMaterial( {color: 0xA8FF93, side: DoubleSide} ), //light box
@@ -90,62 +91,76 @@ function drawBg(scene, WorldSpaceWidth, WorldSpaceHeight) {
 	}
 }
 
-function Path(obj) {
-	this.id = obj.id;
-	this.path = obj.path;
-	this.cars = obj.cars;
-	this.possiblePaths = obj.possiblePaths;
-	this.pathFull = function() {
-		//some logic.
-		//maybe take into account distance of line?
-	}
-}
+
+
+
 
 function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 	let paths = [];
 
-	//1
-	const points1 = [];
-	points1.push( new Vector3( 0 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 ) );
-	points1.push( new Vector3( 5 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 ) );
-	const geometry1 = new BufferGeometry().setFromPoints( points1 );
-	const path1 = new Line( geometry1, materials[3] );
-	paths.push(new Path({
-		id: 1,
-		path: path1
-	}));
-
-
 	//2
-	const curve2 = new CubicBezierCurve(
-		new Vector2( 5 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2) ),
-		new Vector2( 5.5 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2) ),
-		new Vector2( 5.5 -(WorldSpaceWidth/2), -7.5 +(WorldSpaceHeight/2) ),
-		new Vector2( 6 -(WorldSpaceWidth/2), -7.5 +(WorldSpaceHeight/2) )
+	const path2Points = new CurvePath();
+	const path2LineCurve = new CubicBezierCurve3(
+		new Vector3( 5 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 ),
+		new Vector3( 5.5 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 ),
+		new Vector3( 5.5 -(WorldSpaceWidth/2), -7.5 +(WorldSpaceHeight/2), 1 ),
+		new Vector3( 6 -(WorldSpaceWidth/2), -7.5 +(WorldSpaceHeight/2), 1 )
 	);
-	var points2 = curve2.getSpacedPoints(50);
+	path2Points.add(path2LineCurve);
+	let points2 = path2Points.curves.reduce((p, d)=> [...p, ...d.getSpacedPoints(20)], []);
 	const geometry2 = new BufferGeometry().setFromPoints( points2 );
 	const path2 = new Line( geometry2, materials[4] );
-	paths.push(new Path({
+	paths.push(new traffic.Path({
 		id: 2,
-		path: path2
+		path: path2,
+		curvePath: path2Points,
+		possiblePaths: {}
 	}));
 
 	//6
-	const points6 = [];
-	points6.push( new Vector3( 5 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 ) );
-	points6.push( new Vector3( 9 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 ) );
+	const path6Points = new CurvePath();
+	const path6LineCurve = new LineCurve3(
+		new Vector3( 5 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 ),
+		new Vector3( 9 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 )
+	)
+	path6Points.add(path6LineCurve);
+	let points6 = path6Points.curves.reduce((p, d)=> [...p, ...d.getPoints(20)], []);
 	const geometry6 = new BufferGeometry().setFromPoints( points6 );
 	const path6 = new Line( geometry6, materials[5] );
-	paths.push(new Path({
+	paths.push(new traffic.Path({
 		id: 6,
-		path: path6
+		path: path6,
+		curvePath: path6Points,
+		possiblePaths: {}
+	}));
+
+	//1
+	const path1Points = new CurvePath();
+	const path1LineCurve = new LineCurve3(
+		new Vector3( 0 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 ),
+		new Vector3( 5 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 )
+	)
+	path1Points.add(path1LineCurve);
+	let points1 = path1Points.curves.reduce((p, d)=> [...p, ...d.getPoints(20)], []);
+	const geometry1 = new BufferGeometry().setFromPoints( points1 );
+	const path1 = new Line( geometry1, materials[3] );
+	paths.push(new traffic.Path({
+		id: 1,
+		path: path1,
+		curvePath: path1Points,
+		possiblePaths: {
+			n: paths.filter((obj) => obj.id===2)[0],
+			e: paths.filter((obj) => obj.id===6)[0],
+			s: paths.filter((obj) => obj.id===6)[0]
+		}
 	}));
 
 	//Display paths in scene
 	paths.forEach((pathObj) => {
 		scene.add(pathObj.path);
-	})
+	});
+
+	return paths;
 }
 
 let obj = { drawBg, drawPaths };
