@@ -63,7 +63,7 @@ function Path(obj) {
 			let distanceToMoveThisFrame = (0.001*delta)/(this.curvePath.length);
 			let lastPosInCurve = 1;
 			let lastPossibleSpot = lastPosInCurve;
-			if(this.id === 6 || this.id === 2) { //For paths leading up to an intersection: todo: change 2 to 3
+			if(this.id === 6 || this.id === 3) { //For paths leading up to an intersection
 				lastPossibleSpot = 1-(oneUnitLength/2)+(oneUnitLength/10); // the +(oneUnitLength/10) pushes the car right up the intersection
 			}
 			
@@ -103,7 +103,7 @@ function Path(obj) {
 	}
 	this.placeCarAtStart = function(scene, car, offset = 0) {
 		car.pos = 0 + offset;
-		car.circle.position.set(this.curvePath.obj.getPoint(car.pos).x, -1, 5);
+		car.circle.position.set(this.curvePath.obj.getPoint(car.pos).x, this.curvePath.obj.getPoint(car.pos).y, 1);
 		this.cars.unshift(car); // Add car
 		scene.add(car.circle);
 	}

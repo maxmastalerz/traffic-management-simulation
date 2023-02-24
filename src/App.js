@@ -46,7 +46,7 @@ function App() {
 			new traffic.Car({id: 4, desiredDir: 'n'}),
 			new traffic.Car({id: 3, desiredDir: 'e'}),
 			new traffic.Car({id: 2, desiredDir: 'n'}),
-			new traffic.Car({id: 1, desiredDir: 'e'}) //first car to appear
+			new traffic.Car({id: 1, desiredDir: 'n'}) //first car to appear
 		];
 
 		var keepTryingToPlaceCars = setInterval(() => {

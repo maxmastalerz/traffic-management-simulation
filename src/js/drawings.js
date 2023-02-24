@@ -91,12 +91,25 @@ function drawBg(scene, WorldSpaceWidth, WorldSpaceHeight) {
 	}
 }
 
-
-
-
-
 function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 	let paths = [];
+
+	//3
+	const path3Points = new CurvePath();
+	const path3LineCurve = new LineCurve3(
+		new Vector3( 6 -(WorldSpaceWidth/2), -7.5 +(WorldSpaceHeight/2), 1 ),
+		new Vector3( 9 -(WorldSpaceWidth/2), -7.5 +(WorldSpaceHeight/2), 1 )
+	)
+	path3Points.add(path3LineCurve);
+	let points3 = path3Points.curves.reduce((p, d)=> [...p, ...d.getPoints(20)], []);
+	const geometry3 = new BufferGeometry().setFromPoints( points3 );
+	const path3 = new Line( geometry3, materials[5] );
+	paths.push(new traffic.Path({
+		id: 3,
+		path: path3,
+		curvePath: path3Points,
+		possiblePaths: {}
+	}));
 
 	//2
 	const path2Points = new CurvePath();
@@ -114,7 +127,9 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		id: 2,
 		path: path2,
 		curvePath: path2Points,
-		possiblePaths: {}
+		possiblePaths: {
+			n: paths.filter((obj) => obj.id===3)[0]
+		}
 	}));
 
 	//6
