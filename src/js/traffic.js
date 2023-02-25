@@ -4,25 +4,24 @@ import {
 
 import mathHelpers from "./mathHelpers";
 
+const carGeometry = new CircleGeometry( 0.4, 32 );
+const carMaterials = {
+	'n': new MeshBasicMaterial( { color: 0x000080 } ), // Navy blue
+	'e': new MeshBasicMaterial( { color: 0x50C878 } ), // Emerald Green
+	's': new MeshBasicMaterial( { color: 0xC0C0C0 } ), // Silver
+	'w': new MeshBasicMaterial( { color: 0xffffff } )  // White
+}
+
 function Car(obj) {
 	this.id = obj.id;
 	this.desiredDir = obj.desiredDir;
 	this.pos = obj.pos;
-
-	const carMaterials = {
-		'n': new MeshBasicMaterial( { color: 0x000080 } ), // Navy blue
-		'e': new MeshBasicMaterial( { color: 0x50C878 } ), // Emerald Green
-		's': new MeshBasicMaterial( { color: 0xC0C0C0 } ), // Silver
-		'w': new MeshBasicMaterial( { color: 0xffffff } )  // White
-	}
-	const geometry = new CircleGeometry( 0.4, 32 );
-	const circle = new Mesh( geometry, carMaterials[this.desiredDir] );
-
-	this.circle = circle;
+	this.circle = new Mesh( carGeometry, carMaterials[this.desiredDir] );
 }
 
 function Path(obj) {
 	this.id = obj.id;
+	this.geometry = obj.geometry;
 	this.path = obj.path;
 	this.curvePath = {
 		obj: obj.curvePath,
@@ -55,7 +54,7 @@ function Path(obj) {
 			return closestCarPosAdjusted;
 		}
 	}
-	this.progressCars = function(scene, delta) {
+	this.progressCars = function(scene, delta, carCircles) {
 		for(let i=0; i<this.cars.length;i++) {
 			let car = this.cars[i];
 
@@ -91,28 +90,26 @@ function Path(obj) {
 						let overshotEndOfPathBy = (car.pos + distanceToMoveThisFrame) - lastPossibleSpot;
 						let passOnOvershotToNextPath = (overshotEndOfPathBy*this.curvePath.length)/nextPath.curvePath.length;
 						this.cars.pop(); // remove car from source path
-						nextPath.placeCarAtStart(scene, car, passOnOvershotToNextPath); // add car to destination path
+						nextPath.placeCarAtStart(scene, car, carCircles, passOnOvershotToNextPath); // add car to destination path
 						continue; // doing this as I don't want car being drawn on the current path object.
 					}
 				}
 			}
 
 			const newPosition = this.curvePath.obj.getPoint(car.pos);
-			car.circle.position.set(newPosition.x, newPosition.y, 1);
+			car.circle.position.set(newPosition.x, newPosition.y, 2);
 			//const tangent = this.curvePath.obj.getTangent(fraction);
 
 		}
 	}
-	this.placeCarAtStart = function(scene, car, offset = 0) {
+	this.placeCarAtStart = function(scene, car, carCircles, offset = 0) {
 		car.pos = 0 + offset;
-		car.circle.position.set(this.curvePath.obj.getPoint(car.pos).x, this.curvePath.obj.getPoint(car.pos).y, 1);
+		car.circle.position.set(this.curvePath.obj.getPoint(car.pos).x, this.curvePath.obj.getPoint(car.pos).y, 2);
 		this.cars.unshift(car); // Add car
 		scene.add(car.circle);
+		carCircles.push(car.circle);
 	}
 	this.canPlaceCar = function() {
-		//if path.id is 6, can only place if there is space on 6 and there is place on 2.
-		//if path.id is 2, can only place if there is space on 2 and there is space on 6.
-
 		if(this.cars[0] && mathHelpers.epsLessThan(this.cars[0].pos, (1/(this.curvePath.length*2))*2)) {
 			return false;
 		}
@@ -120,11 +117,11 @@ function Path(obj) {
 	}
 }
 
-function progressCars(paths, scene, delta) {
+function progressCars(paths, scene, delta, carCircles) {
 	paths.forEach((path) => {
-		path.progressCars(scene, delta);
+		path.progressCars(scene, delta, carCircles);
 	})
 }
 
-let obj = { Car, Path, progressCars };
+let obj = { Car, Path, progressCars, carGeometry, carMaterials };
 export default obj;

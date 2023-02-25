@@ -37,8 +37,10 @@ function App() {
 		renderer.setSize(canvasCSSPixelWidth, canvasCSSPixelHeight);
 		renderer.setPixelRatio(window.devicePixelRatio);
 
-		drawings.drawBg(scene, WorldSpaceWidth, WorldSpaceHeight);
+		let carCircles = [];
+		let bgItems = drawings.drawBg(scene, WorldSpaceWidth, WorldSpaceHeight);
 		let paths = drawings.drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight);
+
 		let sourcePathObjects = [
 			paths.filter((obj) => obj.id===1)[0],
 			paths.filter((obj) => obj.id===11)[0],
@@ -75,7 +77,7 @@ function App() {
 
 				if(carsToPlace.length > 0) {
 					if(sourcePathObjects[i].canPlaceCar()) {
-						sourcePathObjects[i].placeCarAtStart(scene, carsToPlace[carsToPlace.length-1]);
+						sourcePathObjects[i].placeCarAtStart(scene, carsToPlace[carsToPlace.length-1], carCircles);
 						carsToPlace.pop(); // remove car from queue
 					}
 				}
@@ -112,7 +114,7 @@ function App() {
 				return;
 			}
 
-			traffic.progressCars(paths, scene, delta);
+			traffic.progressCars(paths, scene, delta, carCircles);
 			
 			renderScene();
 		};
@@ -127,14 +129,6 @@ function App() {
 		
 		mnt.appendChild(renderer.domElement);
 
-		renderer.domElement.addEventListener('webglcontextlost', function (event) {
-			console.log('webgl context lost');
-			event.preventDefault();
-			setTimeout(function () {
-				console.log("RESTORING context");
-				renderer.forceContextRestore();
-			}, 1);
-		}, false);
 		window.addEventListener("resize", handleResize);
 		start();
 
@@ -149,9 +143,29 @@ function App() {
 			}
 			
 			//remove objects from scene
-			//scene.remove(something);
-			//geometry.dispose();
-			//material.dispose();
+			bgItems.meshes.forEach((bgMesh) => {
+				scene.remove(bgMesh);
+			});
+			bgItems.geometries.forEach((bgGeometry) => {
+				bgGeometry.dispose();
+			});
+			paths.forEach((pathObj) => {
+				scene.remove(pathObj.path);
+				pathObj.geometry.dispose();
+			});
+			carCircles.forEach((carCircle) => {
+				scene.remove(carCircle);
+			});
+			traffic.carGeometry.dispose();
+			for(let name in traffic.carMaterials) {
+				let material = traffic.carMaterials[name];
+				material.dispose();
+			}
+			for(let i=0;i<drawings.bgAndPathMaterials.length;i++) {
+				let material = drawings.bgAndPathMaterials[i];
+				material.dispose();
+			}
+			drawings.squareGeometry.dispose();
 		}
 	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 

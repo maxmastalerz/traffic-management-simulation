@@ -4,16 +4,18 @@ import {
 } from 'three';
 import traffic from "./traffic";
 
-const materials = [
-	new MeshBasicMaterial( {color: 0xA8FF93, side: DoubleSide} ), //light box
-	new MeshBasicMaterial( {color: 0x8AFC6E, side: DoubleSide} ), //darker box
+const bgAndPathMaterials = [
+	new MeshBasicMaterial( {color: 0xA8FF93, side: DoubleSide} ), //light green box
+	new MeshBasicMaterial( {color: 0x8AFC6E, side: DoubleSide} ), //darker green box
 	new MeshBasicMaterial( {color: 0x807E78, side: DoubleSide} ), //asphalt grey road
 	new LineBasicMaterial( { color: 0xff0000 } ), // Red line
 	new LineBasicMaterial( { color: 0x00ff00 } ), // Green line
 	new LineBasicMaterial( { color: 0x0000ff } ), // Blue line
 ];
 
-function drawStorageBayTaperAndMissingBg(scene, rotationOnZAxis) {
+const squareGeometry = new PlaneGeometry( 1, 1 );
+
+function drawStorageBayTaperAndMissingBg(scene, rotationOnZAxis, bgItems) {
 	//the storage bay starts (Math.sqrt(2)-1 earlier to make diagonal lane remain at 1 unit of width
 	const x = -5.5-(Math.sqrt(2)-1), y = -0.5; //Default start position for drawing the tile
 
@@ -24,10 +26,12 @@ function drawStorageBayTaperAndMissingBg(scene, rotationOnZAxis) {
 	missingBg.lineTo( x, y+1 );
 
 	const missingBgTriangleGeometry = new ShapeGeometry( missingBg );
-	const missingBgMesh = new Mesh( missingBgTriangleGeometry, materials[0] ) ;
+	bgItems.geometries.push(missingBgTriangleGeometry);
+	const missingBgMesh = new Mesh( missingBgTriangleGeometry, bgAndPathMaterials[0] ) ;
 
 	missingBgMesh.rotateOnWorldAxis(new Vector3(0, 0, 1), rotationOnZAxis);
 	scene.add( missingBgMesh );
+	bgItems.meshes.push(missingBgMesh);
 
 	//Storage Bay Taper:
 	const storageBayTaper = new Shape();
@@ -36,10 +40,12 @@ function drawStorageBayTaperAndMissingBg(scene, rotationOnZAxis) {
 	storageBayTaper.lineTo( x+1, y );
 
 	const storageBayTaperTriangleGeometry = new ShapeGeometry( storageBayTaper );
-	const storageBayTaperMesh = new Mesh( storageBayTaperTriangleGeometry, materials[2] ) ;
+	bgItems.geometries.push(storageBayTaperTriangleGeometry);
+	const storageBayTaperMesh = new Mesh( storageBayTaperTriangleGeometry, bgAndPathMaterials[2] ) ;
 
 	storageBayTaperMesh.rotateOnWorldAxis(new Vector3(0, 0, 1), rotationOnZAxis);
 	scene.add( storageBayTaperMesh );
+	bgItems.meshes.push(storageBayTaperMesh);
 
 	//Storage Bay Taper missing road piece
 	const storageBayTaperMissingRoad = new Shape();
@@ -49,13 +55,19 @@ function drawStorageBayTaperAndMissingBg(scene, rotationOnZAxis) {
 	storageBayTaperMissingRoad.lineTo( x+1+(Math.sqrt(2)-1), y );
 
 	const storageBayTaperMissingRoadGeometry = new ShapeGeometry( storageBayTaperMissingRoad );
-	const storageBayTaperMissingRoadMesh = new Mesh( storageBayTaperMissingRoadGeometry, materials[2] ) ;
+	bgItems.geometries.push(storageBayTaperMissingRoadGeometry);
+	const storageBayTaperMissingRoadMesh = new Mesh( storageBayTaperMissingRoadGeometry, bgAndPathMaterials[2] ) ;
 
 	storageBayTaperMissingRoadMesh.rotateOnWorldAxis(new Vector3(0, 0, 1), rotationOnZAxis);
 	scene.add( storageBayTaperMissingRoadMesh );
+	bgItems.meshes.push(storageBayTaperMissingRoadMesh);
 }
 
 function drawBg(scene, WorldSpaceWidth, WorldSpaceHeight) {
+	let bgItems = {
+		meshes: [],
+		geometries: []
+	};
 	const map = [
 		[0,1,0,1,0,1,0,1,0,2,0,2,0,1,0,1,0,1,0,1,0],
 		[1,0,1,0,1,0,1,0,1,2,1,2,1,0,1,0,1,0,1,0,1],
@@ -74,21 +86,22 @@ function drawBg(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		[0,1,0,1,0,1,0,1,0,2,0,2,0,1,0,1,0,1,0,1,0]
 	];
 
-	const geometry = new PlaneGeometry( 1, 1 );
-
 	for(var i=0;i<map.length;i++) {
 		for(var j=0; j<map[i].length;j++) {
 			if(map[i][j] <= 2) { //Square shaped boxes
-				let material = materials[ map[i][j] ];
-				const plane = new Mesh( geometry, material );
+				let material = bgAndPathMaterials[ map[i][j] ];
+				const plane = new Mesh( squareGeometry, material );
 				plane.position.set(j-(WorldSpaceWidth/2)+0.5,-i+(WorldSpaceHeight/2)-0.5);
 				scene.add( plane );
+				bgItems.meshes.push(plane);
 			} else if(map[i][j] >= 3) { //Storage bay tapers
 				let rotationOnZAxis = -(map[i][j]-3)*Math.PI/2;
-				drawStorageBayTaperAndMissingBg(scene, rotationOnZAxis);
+				drawStorageBayTaperAndMissingBg(scene, rotationOnZAxis, bgItems);
 			}
 		}
 	}
+
+	return bgItems;
 }
 
 function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
@@ -121,9 +134,10 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		path5Points.add(path5LineCurve);
 		let points5 = path5Points.curves.reduce((p, d)=> [...p, ...d.getPoints(20)], []);
 		const geometry5 = new BufferGeometry().setFromPoints( points5 );
-		const path5 = new Line( geometry5, materials[4] );
+		const path5 = new Line( geometry5, bgAndPathMaterials[4] );
 		paths.push(new traffic.Path({
 			id: 5+(10*i),
+			geometry: geometry5,
 			path: path5,
 			curvePath: path5Points,
 			possiblePaths: {}
@@ -144,9 +158,10 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		path4Points.add(path4LineCurve);
 		let points4 = path4Points.curves.reduce((p, d)=> [...p, ...d.getSpacedPoints(20)], []);
 		const geometry4 = new BufferGeometry().setFromPoints( points4 );
-		const path4 = new Line( geometry4, materials[3] );
+		const path4 = new Line( geometry4, bgAndPathMaterials[3] );
 		paths.push(new traffic.Path({
 			id: 4+(10*i),
+			geometry: geometry4,
 			path: path4,
 			curvePath: path4Points,
 			possiblePaths: {
@@ -165,9 +180,10 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		path3Points.add(path3LineCurve);
 		let points3 = path3Points.curves.reduce((p, d)=> [...p, ...d.getPoints(20)], []);
 		const geometry3 = new BufferGeometry().setFromPoints( points3 );
-		const path3 = new Line( geometry3, materials[5] );
+		const path3 = new Line( geometry3, bgAndPathMaterials[5] );
 		paths.push(new traffic.Path({
 			id: 3+(10*i),
+			geometry: geometry3,
 			path: path3,
 			curvePath: path3Points,
 			possiblePaths: {
@@ -190,9 +206,10 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		path2Points.add(path2LineCurve);
 		let points2 = path2Points.curves.reduce((p, d)=> [...p, ...d.getSpacedPoints(20)], []);
 		const geometry2 = new BufferGeometry().setFromPoints( points2 );
-		const path2 = new Line( geometry2, materials[4] );
+		const path2 = new Line( geometry2, bgAndPathMaterials[4] );
 		paths.push(new traffic.Path({
 			id: 2+(10*i),
+			geometry: geometry2,
 			path: path2,
 			curvePath: path2Points,
 			possiblePaths: {
@@ -211,9 +228,10 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		path8Points.add(path8LineCurve);
 		let points8 = path8Points.curves.reduce((p, d)=> [...p, ...d.getPoints(20)], []);
 		const geometry8 = new BufferGeometry().setFromPoints( points8 );
-		const path8 = new Line( geometry8, materials[3] );
+		const path8 = new Line( geometry8, bgAndPathMaterials[3] );
 		paths.push(new traffic.Path({
 			id: 8+(10*i),
+			geometry: geometry8,
 			path: path8,
 			curvePath: path8Points,
 			possiblePaths: {}
@@ -230,9 +248,10 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		path7Points.add(path7LineCurve);
 		let points7 = path7Points.curves.reduce((p, d)=> [...p, ...d.getPoints(20)], []);
 		const geometry7 = new BufferGeometry().setFromPoints( points7 );
-		const path7 = new Line( geometry7, materials[4] );
+		const path7 = new Line( geometry7, bgAndPathMaterials[4] );
 		paths.push(new traffic.Path({
 			id: 7+(10*i),
+			geometry: geometry7,
 			path: path7,
 			curvePath: path7Points,
 			possiblePaths: {
@@ -251,9 +270,10 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		path10Points.add(path10LineCurve);
 		let points10 = path10Points.curves.reduce((p, d)=> [...p, ...d.getPoints(20)], []);
 		const geometry10 = new BufferGeometry().setFromPoints( points10 );
-		const path10 = new Line( geometry10, materials[5] );
+		const path10 = new Line( geometry10, bgAndPathMaterials[5] );
 		paths.push(new traffic.Path({
 			id: 10+(10*i),
+			geometry: geometry10,
 			path: path10,
 			curvePath: path10Points,
 			possiblePaths: {
@@ -275,9 +295,10 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		path9Points.add(path9LineCurve);
 		let points9 = path9Points.curves.reduce((p, d)=> [...p, ...d.getSpacedPoints(20)], []);
 		const geometry9 = new BufferGeometry().setFromPoints( points9 );
-		const path9 = new Line( geometry9, materials[3] );
+		const path9 = new Line( geometry9, bgAndPathMaterials[3] );
 		paths.push(new traffic.Path({
 			id: 9+(10*i),
+			geometry: geometry9,
 			path: path9,
 			curvePath: path9Points,
 			possiblePaths: {
@@ -296,9 +317,10 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		path6Points.add(path6LineCurve);
 		let points6 = path6Points.curves.reduce((p, d)=> [...p, ...d.getPoints(20)], []);
 		const geometry6 = new BufferGeometry().setFromPoints( points6 );
-		const path6 = new Line( geometry6, materials[5] );
+		const path6 = new Line( geometry6, bgAndPathMaterials[5] );
 		paths.push(new traffic.Path({
 			id: 6+(10*i),
+			geometry: geometry6,
 			path: path6,
 			curvePath: path6Points,
 			possiblePaths: {
@@ -319,10 +341,11 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		//path1Points.rotateOnWorldAxis(new Vector3(0, 0, 1), Math.PI/2);//todo: temporary testing
 		let points1 = path1Points.curves.reduce((p, d)=> [...p, ...d.getPoints(20)], []);
 		const geometry1 = new BufferGeometry().setFromPoints( points1 );
-		const path1 = new Line( geometry1, materials[3] );
+		const path1 = new Line( geometry1, bgAndPathMaterials[3] );
 		
 		paths.push(new traffic.Path({
 			id: 1+(10*i),
+			geometry: geometry1,
 			path: path1,
 			curvePath: path1Points,
 			possiblePaths: {
@@ -342,5 +365,5 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 	return paths;
 }
 
-let obj = { drawBg, drawPaths };
+let obj = { drawBg, drawPaths, bgAndPathMaterials, squareGeometry };
 export default obj;
