@@ -89,8 +89,9 @@ function Path(obj) {
 					if(nextPath.canPlaceCar()) {
 						let overshotEndOfPathBy = (car.pos + distanceToMoveThisFrame) - lastPossibleSpot;
 						let passOnOvershotToNextPath = (overshotEndOfPathBy*this.curvePath.length)/nextPath.curvePath.length;
-						this.cars.pop(); // remove car from source path
-						nextPath.placeCarAtStart(scene, car, carCircles, passOnOvershotToNextPath); // add car to destination path
+						
+						let sequentialPlacement = { prevPathCars: this.cars, offset: passOnOvershotToNextPath };
+						nextPath.placeCarAtStart(scene, car, carCircles, sequentialPlacement); // add car to destination path
 						continue; // doing this as I don't want car being drawn on the current path object.
 					}
 				}
@@ -102,12 +103,18 @@ function Path(obj) {
 
 		}
 	}
-	this.placeCarAtStart = function(scene, car, carCircles, offset = 0) {
-		car.pos = 0 + offset;
+	this.placeCarAtStart = function(scene, car, carCircles, sequentialPlacement = false) {
+		if(!sequentialPlacement) { // first/initial placement of car
+			car.pos = 0;
+			scene.add(car.circle);
+			carCircles.push(car.circle);
+		} else { //car going onto future path
+			car.pos = 0 + sequentialPlacement.offset;
+			sequentialPlacement.prevPathCars.pop(); // remove car from source path
+		}
+		
 		car.circle.position.set(this.curvePath.obj.getPoint(car.pos).x, this.curvePath.obj.getPoint(car.pos).y, 2);
 		this.cars.unshift(car); // Add car
-		scene.add(car.circle);
-		carCircles.push(car.circle);
 	}
 	this.canPlaceCar = function() {
 		if(this.cars[0] && mathHelpers.epsLessThan(this.cars[0].pos, (1/(this.curvePath.length*2))*2)) {
