@@ -1,3 +1,7 @@
+function closeEqu(x, y) {
+	return Math.abs(x - y) < Number.EPSILON*1000000;
+}
+
 function epsEqu(x, y) {
     return Math.abs(x - y) < Number.EPSILON;
 }
@@ -9,5 +13,5 @@ function epsLessThan(x, y) {
 	return x < y;
 }
 
-let obj = { epsEqu, epsLessThan };
+let obj = { closeEqu, epsEqu, epsLessThan };
 export default obj;

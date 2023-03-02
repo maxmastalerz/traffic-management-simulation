@@ -338,7 +338,6 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 
 		const path1Points = new CurvePath();
 		path1Points.add(path1LineCurve);
-		//path1Points.rotateOnWorldAxis(new Vector3(0, 0, 1), Math.PI/2);//todo: temporary testing
 		let points1 = path1Points.curves.reduce((p, d)=> [...p, ...d.getPoints(20)], []);
 		const geometry1 = new BufferGeometry().setFromPoints( points1 );
 		const path1 = new Line( geometry1, bgAndPathMaterials[3] );

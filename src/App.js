@@ -1,10 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Scene, OrthographicCamera, WebGLRenderer /*, BoxGeometry, MeshBasicMaterial, Mesh*/ } from 'three';
 
 import './App.css';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import { Container, DropdownButton, Dropdown, Row, Col } from 'react-bootstrap';
 
 import update100VhToExcludeScrollbar from "./js/vhFix";
 import drawings from "./js/drawings";
@@ -15,6 +13,79 @@ function App() {
 	const requestIdRef = useRef(null);
 	const startTime = useRef(undefined);
 	const prevTime = useRef(undefined);
+	const [simulationMode, setSimulationMode] = useState("Pre-timed"); //pre-timed, fully-actuated, rtk-enabled
+
+	let scene = useRef(null);
+	let paths = useRef(null);
+	let allowedPaths = useRef(null);
+	var keepTryingToPlaceCars = useRef(null);
+	let phaseStartTime = useRef(null);
+	var preTimedInterval = useRef(null);
+	var preTimedNumPhasesPassed = useRef(0);
+	const preTimedPhaseTime = 5800;
+	let targetPhaseTime = useRef(preTimedPhaseTime);
+	var prevDelta = useRef(null);
+	var prevprevTime = useRef(null);
+	var overshot = useRef(0);
+	//let phaseNum = 0;
+
+	//Go thru paths, get every car on these paths, remove their mesh memory(car circle) from the scene.
+	//Also clear the cars from the path(unless circleMemoryOnly is set)
+	const clearOldCarsFromPaths = (circleMemoryOnly = false) => {
+		if(paths.current) {
+			paths.current.forEach((path) => {
+				path.cars.forEach((car) => {
+					scene.current.remove(car.circle);
+				});
+				if(!circleMemoryOnly) {
+					path.cars = [];
+				}
+			});
+		}
+	};
+
+	const resetCars = () => {
+		clearOldCarsFromPaths();
+		if(keepTryingToPlaceCars.current) clearInterval(keepTryingToPlaceCars.current);
+
+		let sourcePathObjects = [
+			paths.current.filter((obj) => obj.id===1)[0],
+			paths.current.filter((obj) => obj.id===11)[0],
+			paths.current.filter((obj) => obj.id===21)[0],
+			paths.current.filter((obj) => obj.id===31)[0]
+		]
+
+		let carPlacements = [
+			[//will be placed on path 1
+				new traffic.Car({id: 4, desiredDir: 'e'}),// last car to appear
+				new traffic.Car({id: 3, desiredDir: 'e'}),
+				new traffic.Car({id: 2, desiredDir: 'e'}),
+				new traffic.Car({id: 1, desiredDir: 'n'})  // first car to appear
+			],
+			[//will be placed on path 11
+			],
+			[//will be placed on path 21
+			],
+			[//will be placed on path 31
+			]
+		]
+
+		keepTryingToPlaceCars.current = setInterval(() => {
+			for(let i=0;i<4;i++) {//for each of the cardinal directions
+				let carsToPlace = carPlacements[i];
+
+				if(carsToPlace.length > 0) {
+					if(sourcePathObjects[i].canPlaceCar()) {
+						sourcePathObjects[i].placeCarAtStart(scene.current, carsToPlace[carsToPlace.length-1]);
+						carsToPlace.pop(); // remove car from queue
+					}
+				}
+			}
+			if(carPlacements[0].length + carPlacements[1].length + carPlacements[2].length + carPlacements[3].length === 0) { // all cars placed
+				clearInterval(keepTryingToPlaceCars.current);
+			}
+		}, 1);
+	};
 
 	useEffect(() => {
 		let mnt = mount.current;
@@ -22,8 +93,8 @@ function App() {
     	let canvasCSSPixelHeight = mnt.clientHeight;
     	const aspectRatio = canvasCSSPixelWidth/canvasCSSPixelHeight; // Will come out to 7/5 aspect ratio.
 
-    	// == Begin three.js set up ==
-    	const scene = new Scene();
+		// == Begin three.js set up ==
+		scene.current = new Scene();
 
     	//Define orthographic frustum
 		const WorldSpaceHeight = 15; // aka the view size.
@@ -37,58 +108,13 @@ function App() {
 		renderer.setSize(canvasCSSPixelWidth, canvasCSSPixelHeight);
 		renderer.setPixelRatio(window.devicePixelRatio);
 
-		let carCircles = [];
-		let bgItems = drawings.drawBg(scene, WorldSpaceWidth, WorldSpaceHeight);
-		let paths = drawings.drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight);
+		let bgItems = drawings.drawBg(scene.current, WorldSpaceWidth, WorldSpaceHeight);
+		paths.current = drawings.drawPaths(scene.current, WorldSpaceWidth, WorldSpaceHeight);
 
-		let sourcePathObjects = [
-			paths.filter((obj) => obj.id===1)[0],
-			paths.filter((obj) => obj.id===11)[0],
-			paths.filter((obj) => obj.id===21)[0],
-			paths.filter((obj) => obj.id===31)[0]
-		]
-
-		let carPlacements = [
-			[//will be placed on path 1
-				new traffic.Car({id: 3, desiredDir: 's'}), // last car to appear
-				new traffic.Car({id: 2, desiredDir: 'e'}),
-				new traffic.Car({id: 1, desiredDir: 'n'})  // first car to appear
-			],
-			[//will be placed on path 11
-				new traffic.Car({id: 6, desiredDir: 'w'}), // last car to appear
-				new traffic.Car({id: 5, desiredDir: 's'}),
-				new traffic.Car({id: 4, desiredDir: 'e'})  // first car to appear
-			],
-			[//will be placed on path 21
-				new traffic.Car({id: 9, desiredDir: 'n'}), // last car to appear
-				new traffic.Car({id: 8, desiredDir: 'w'}),
-				new traffic.Car({id: 7, desiredDir: 's'})  // first car to appear
-			],
-			[//will be placed on path 31
-				new traffic.Car({id: 12, desiredDir: 'e'}), // last car to appear
-				new traffic.Car({id: 11, desiredDir: 'n'}),
-				new traffic.Car({id: 10, desiredDir: 'w'})  // first car to appear
-			]
-		]
-
-		var keepTryingToPlaceCars = setInterval(() => {
-			for(let i=0;i<4;i++) {//for each of the cardinal directions
-				let carsToPlace = carPlacements[i];
-
-				if(carsToPlace.length > 0) {
-					if(sourcePathObjects[i].canPlaceCar()) {
-						sourcePathObjects[i].placeCarAtStart(scene, carsToPlace[carsToPlace.length-1], carCircles);
-						carsToPlace.pop(); // remove car from queue
-					}
-				}
-			}
-			if(carPlacements[0].length + carPlacements[1].length + carPlacements[2].length + carPlacements[3].length === 0) { // all cars placed
-				clearInterval(keepTryingToPlaceCars);
-			}
-		}, 1);
+		resetCars();
 
 		const renderScene = () => {
-			renderer.render(scene, camera);
+			renderer.render(scene.current, camera);
 		}
 
 		const handleResize = () => {
@@ -102,19 +128,50 @@ function App() {
 		const tick = (now) => {
 			requestIdRef.current = requestAnimationFrame(tick);
 
-			if(startTime.current === undefined) {
-				startTime.current = now;
-			}
 			const delta = (now - prevTime.current);
-			//console.log("diff in time from last time frame: "+delta);
-			//console.log("time from 1st frame:"+(now-startTime.current))
-			
+			prevDelta.current = prevTime.current - prevprevTime.current;
+
+			let prevTimeSaved = prevTime.current;
 			prevTime.current = now;
 			if(isNaN(delta)) { // skip very first delta to prevent jumping
 				return;
 			}
 
-			traffic.progressCars(paths, scene, delta, carCircles);
+			prevprevTime.current = prevTimeSaved;
+			if(isNaN(prevDelta.current)) {
+				return;
+			}
+
+			if(startTime.current === undefined) {
+				startTime.current = now;
+			}
+
+			//Pre-timed			
+			const phases = [
+				[14,34],
+				[17,19,37,39],
+				[24,4],
+				[27,29,7,9]
+			];
+
+			if(phaseStartTime.current === null) {
+				phaseStartTime.current = now;
+			}
+
+			if(now >= targetPhaseTime.current) {
+				overshot.current = (now - targetPhaseTime.current);
+				preTimedNumPhasesPassed.current++;
+				console.log("phase: "+preTimedNumPhasesPassed.current%4+" (started "+overshot.current+"ms late)");
+				phaseStartTime.current = now;
+				targetPhaseTime.current = (preTimedPhaseTime * (preTimedNumPhasesPassed.current + 1));
+			}
+
+			allowedPaths.current = phases[(preTimedNumPhasesPassed.current)%4];
+			let timeTilNextPhase = targetPhaseTime.current-now+(overshot.current);
+			//console.log("timeTilNextPhase:"+timeTilNextPhase);
+			//console.log("timeTilNextPhase+(prevDelta x 2):"+(timeTilNextPhase+(prevDelta.current*2)));
+
+			traffic.progressCars(paths.current, scene.current, prevDelta.current, delta, allowedPaths.current, timeTilNextPhase);
 			
 			renderScene();
 		};
@@ -144,18 +201,16 @@ function App() {
 			
 			//remove objects from scene
 			bgItems.meshes.forEach((bgMesh) => {
-				scene.remove(bgMesh);
+				scene.current.remove(bgMesh);
 			});
 			bgItems.geometries.forEach((bgGeometry) => {
 				bgGeometry.dispose();
 			});
-			paths.forEach((pathObj) => {
-				scene.remove(pathObj.path);
+			paths.current.forEach((pathObj) => {
+				scene.current.remove(pathObj.path);
 				pathObj.geometry.dispose();
 			});
-			carCircles.forEach((carCircle) => {
-				scene.remove(carCircle);
-			});
+			clearOldCarsFromPaths(true);
 			traffic.carGeometry.dispose();
 			for(let name in traffic.carMaterials) {
 				let material = traffic.carMaterials[name];
@@ -169,10 +224,56 @@ function App() {
 		}
 	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+	useEffect(() => {
+		resetCars();
+		if(preTimedInterval.current) clearInterval(preTimedInterval.current);
+
+		if(simulationMode === "Pre-timed") {
+			//phaseNum = 4;
+			/*const phases = [
+				[4,24],
+				[7,27],
+				[9,29],
+				[14,34],
+				[17,37],
+				[19,39],
+			];
+			allowedPaths.current = phases[(preTimedPhaseNum.current)%6];
+			console.log("Phase: 5");
+
+			function changePhase() {
+				phaseStartTime.current = Date.now();
+				
+				console.log("Phase: "+((preTimedPhaseNum.current%6)+1));
+				allowedPaths.current = phases[(preTimedPhaseNum.current)%6];
+				//phaseNum++;
+
+			}
+			changePhase();
+
+			preTimedInterval.current = setInterval(changePhase, phaseTime);*/
+		} else if(simulationMode === "Fully-actuated") {
+			//console.log("Swapping to Fully-actuated");
+
+		} else if(simulationMode === "RTK-enabled") {
+			//console.log("Swapping to RTK-enabled");
+
+		}
+		
+	}, [simulationMode]); // eslint-disable-line react-hooks/exhaustive-deps
+
 	return (
 		<Container fluid>
 			<Row id="vh-100-without-scrollbar">
-				<Col className="bg-primary" xs={2}>General Settings</Col>
+				<Col className="bg-primary" xs={2}>
+					General Settings<br/>
+					<DropdownButton id="simulation-mode-dropdown" title={simulationMode} variant="warning" onSelect={setSimulationMode}>
+						<Dropdown.Item eventKey="Pre-timed">Pre-timed</Dropdown.Item>
+						<Dropdown.Item eventKey="Fully-actuated">Fully-actuated</Dropdown.Item>
+						<Dropdown.Item eventKey="RTK-enabled">RTK-enabled</Dropdown.Item>
+					</DropdownButton>
+
+				</Col>
 				<Col className="bg-info px-0" xs={10}>
 					<Container fluid className="ps-2 pe-0 h-100">
 						<Row id="simulation-row-1" className="px-0 m-auto">
