@@ -30,10 +30,6 @@ function Path(obj) {
 
 	this.cars = [];
 	this.possiblePaths = obj.possiblePaths;
-	/*this.pathFull = function() {
-		//some logic.
-		//maybe take into account distance of line?
-	}*/
 
 	/*
 	Looks at the next paths car could go to and sees if there is a car in the way.
@@ -54,7 +50,7 @@ function Path(obj) {
 			return closestCarPosAdjusted;
 		}
 	}
-	this.progressCars = function(scene, delta, carCircles) {
+	this.progressCars = function(scene, delta, stopWithinPaths) {
 		for(let i=0; i<this.cars.length;i++) {
 			let car = this.cars[i];
 
@@ -63,8 +59,7 @@ function Path(obj) {
 			let lastPosInCurve = 1;
 			let lastPossibleSpot = lastPosInCurve;
 
-			//TODO: Implement intersection control somewhere.
-			if([3,6,13,16,23,26,33,36].includes(this.id)) { //For paths leading up to an intersection
+			if(stopWithinPaths.includes(this.id)) { //For paths leading up to an intersection [3,6,13,16,23,26,33,36]
 				lastPossibleSpot = 1-(oneUnitLength/2)+(oneUnitLength/10); // the +(oneUnitLength/10) pushes the car right up the intersection
 			}
 			
@@ -91,7 +86,7 @@ function Path(obj) {
 						let passOnOvershotToNextPath = (overshotEndOfPathBy*this.curvePath.length)/nextPath.curvePath.length;
 						
 						let sequentialPlacement = { prevPathCars: this.cars, offset: passOnOvershotToNextPath };
-						nextPath.placeCarAtStart(scene, car, carCircles, sequentialPlacement); // add car to destination path
+						nextPath.placeCarAtStart(scene, car, sequentialPlacement); // add car to destination path
 						continue; // doing this as I don't want car being drawn on the current path object.
 					}
 				}
@@ -103,11 +98,11 @@ function Path(obj) {
 
 		}
 	}
-	this.placeCarAtStart = function(scene, car, carCircles, sequentialPlacement = false) {
+	this.placeCarAtStart = function(scene, car, sequentialPlacement = false) {
+		//console.log(scene.children);
 		if(!sequentialPlacement) { // first/initial placement of car
 			car.pos = 0;
 			scene.add(car.circle);
-			carCircles.push(car.circle);
 		} else { //car going onto future path
 			car.pos = 0 + sequentialPlacement.offset;
 			sequentialPlacement.prevPathCars.pop(); // remove car from source path
@@ -124,9 +119,9 @@ function Path(obj) {
 	}
 }
 
-function progressCars(paths, scene, delta, carCircles) {
+function progressCars(paths, scene, delta, stopWithinPaths) {
 	paths.forEach((path) => {
-		path.progressCars(scene, delta, carCircles);
+		path.progressCars(scene, delta, stopWithinPaths);
 	})
 }
 
