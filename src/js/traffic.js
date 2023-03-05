@@ -50,11 +50,11 @@ function Path(obj) {
 			return closestCarPosAdjusted;
 		}
 	}
-	this.progressCars = function(scene, prevDelta, delta, allowedPaths, timeTilNextPhase) {
-		for(let i=0; i<this.cars.length;i++) {
+	this.progressCars = function(scene, prevFramePaths, delta, allowedPaths, timeTilNextPhase) {
+		for(let i=this.cars.length-1; i>=0;i--) {
 			let car = this.cars[i];
 
-			const speed = 0.001;
+			const speed = 0.002;
 			let oneUnitLength = 1/(this.curvePath.length);
 			let distanceToMoveThisFrame = (speed*delta)/(this.curvePath.length);
 			let lastPosInCurve = 1;
@@ -69,16 +69,7 @@ function Path(obj) {
 						let timeToStopPos = distanceToStopPos/speed;
 						let timeNeededToFullyCross = timeToStopPos+(nextPath.curvePath.length/speed)+((0.4/speed)*2);
 
-						
-						if(car.pos>0.747 & car.pos<0.753) {
-							//console.log("delta: "+delta);
-							//console.log("prevDelta: "+prevDelta);
-							console.log(timeNeededToFullyCross+" >= ("+timeTilNextPhase+"  OR  "+(timeTilNextPhase+delta)+")");
-						}
-						if(!(mathHelpers.closeEqu(timeNeededToFullyCross, timeTilNextPhase)  ||
-							 mathHelpers.closeEqu(timeNeededToFullyCross, timeTilNextPhase+delta) ) &&
-							timeNeededToFullyCross > timeTilNextPhase
-							) {
+						if(timeNeededToFullyCross > (timeTilNextPhase+delta)) {
 							lastPossibleSpot = 1-(oneUnitLength/2)+(oneUnitLength/10);
 							stoppedAtIntersection = true;
 						}
@@ -90,8 +81,9 @@ function Path(obj) {
 				}
 			}
 			
-			if(this.cars[i+1]) { //If there is a car in front of me on same path, the last possible spot is right behind that car.
-				lastPossibleSpot = this.cars[i+1].pos - oneUnitLength + ((speed*prevDelta)/(this.curvePath.length)); //The prevdelta calculation pushes the car forward to where it should be as cars should move together rather than being delayed a frame
+			if(this.cars[i+1]) { //If there is a car in front of me on same path, the last possible spot is right behind that car(based on where he was last frame).
+				let prevFramePath = prevFramePaths.filter((prevFramePath) => prevFramePath.id === this.id)[0];
+				lastPossibleSpot = prevFramePath.cars[i+1].pos - oneUnitLength;
 			} else if(!stoppedAtIntersection) { //If I'm the first car on the path, there might be an interfering car in front of me on a next path.
 				let nearestCarInNextPathsPos = this.nearestInterferingCarInNextPaths(car.pos);
 				if(nearestCarInNextPathsPos) {
@@ -145,9 +137,9 @@ function Path(obj) {
 	}
 }
 
-function progressCars(paths, scene, prevDelta, delta, allowedPaths, timeTilNextPhase) {
+function progressCars(paths, scene, prevFramePaths, delta, allowedPaths, timeTilNextPhase) {
 	paths.forEach((path) => {
-		path.progressCars(scene, prevDelta, delta, allowedPaths, timeTilNextPhase);
+		path.progressCars(scene, prevFramePaths, delta, allowedPaths, timeTilNextPhase);
 	})
 }
 

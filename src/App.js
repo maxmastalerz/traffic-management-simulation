@@ -22,10 +22,9 @@ function App() {
 	let phaseStartTime = useRef(null);
 	var preTimedInterval = useRef(null);
 	var preTimedNumPhasesPassed = useRef(0);
-	const preTimedPhaseTime = 5800;
+	const preTimedPhaseTime = 3400; //Example: (0.8/0.002)+((2+4)/0.003) for 4 cars at 0.002 speed.
 	let targetPhaseTime = useRef(preTimedPhaseTime);
-	var prevDelta = useRef(null);
-	var prevprevTime = useRef(null);
+	var prevFramePaths = useRef(null);
 	var overshot = useRef(0);
 	//let phaseNum = 0;
 
@@ -57,16 +56,42 @@ function App() {
 
 		let carPlacements = [
 			[//will be placed on path 1
-				new traffic.Car({id: 4, desiredDir: 'e'}),// last car to appear
+				new traffic.Car({id: 13, desiredDir: 's'}), // last car to appear
+				new traffic.Car({id: 12, desiredDir: 'n'}),
+				new traffic.Car({id: 11, desiredDir: 'n'}),
+				new traffic.Car({id: 10, desiredDir: 'e'}),
+				new traffic.Car({id: 9, desiredDir: 'e'}),
+				new traffic.Car({id: 8, desiredDir: 's'}),
+				new traffic.Car({id: 7, desiredDir: 'n'}),
+				new traffic.Car({id: 6, desiredDir: 'n'}),
+				new traffic.Car({id: 5, desiredDir: 'e'}),
+				new traffic.Car({id: 4, desiredDir: 'e'}),
 				new traffic.Car({id: 3, desiredDir: 'e'}),
 				new traffic.Car({id: 2, desiredDir: 'e'}),
-				new traffic.Car({id: 1, desiredDir: 'n'})  // first car to appear
+				new traffic.Car({id: 1, desiredDir: 'e'}), // first car to appear
 			],
 			[//will be placed on path 11
+				new traffic.Car({id: 20, desiredDir: 's'}), // last car to appear
+				new traffic.Car({id: 19, desiredDir: 's'}),
+				new traffic.Car({id: 18, desiredDir: 'e'}),
+				new traffic.Car({id: 17, desiredDir: 'w'}),
+				new traffic.Car({id: 16, desiredDir: 'w'}),
+				new traffic.Car({id: 15, desiredDir: 'e'}),
+				new traffic.Car({id: 14, desiredDir: 'w'}), // first car to appear
 			],
 			[//will be placed on path 21
+				new traffic.Car({id: 27, desiredDir: 'w'}), // last car to appear
+				new traffic.Car({id: 26, desiredDir: 'n'}),
+				new traffic.Car({id: 25, desiredDir: 's'}),
+				new traffic.Car({id: 24, desiredDir: 'n'}),
+				new traffic.Car({id: 23, desiredDir: 'w'}),
+				new traffic.Car({id: 22, desiredDir: 's'}),
+				new traffic.Car({id: 21, desiredDir: 's'}), // first car to appear
 			],
 			[//will be placed on path 31
+				new traffic.Car({id: 30, desiredDir: 'n'}), // last car to appear
+				new traffic.Car({id: 29, desiredDir: 'w'}),
+				new traffic.Car({id: 28, desiredDir: 'e'}), // first car to appear
 			]
 		]
 
@@ -129,16 +154,9 @@ function App() {
 			requestIdRef.current = requestAnimationFrame(tick);
 
 			const delta = (now - prevTime.current);
-			prevDelta.current = prevTime.current - prevprevTime.current;
 
-			let prevTimeSaved = prevTime.current;
 			prevTime.current = now;
 			if(isNaN(delta)) { // skip very first delta to prevent jumping
-				return;
-			}
-
-			prevprevTime.current = prevTimeSaved;
-			if(isNaN(prevDelta.current)) {
 				return;
 			}
 
@@ -168,10 +186,10 @@ function App() {
 
 			allowedPaths.current = phases[(preTimedNumPhasesPassed.current)%4];
 			let timeTilNextPhase = targetPhaseTime.current-now+(overshot.current);
-			//console.log("timeTilNextPhase:"+timeTilNextPhase);
-			//console.log("timeTilNextPhase+(prevDelta x 2):"+(timeTilNextPhase+(prevDelta.current*2)));
 
-			traffic.progressCars(paths.current, scene.current, prevDelta.current, delta, allowedPaths.current, timeTilNextPhase);
+			traffic.progressCars(paths.current, scene.current, prevFramePaths.current, delta, allowedPaths.current, timeTilNextPhase);
+
+			prevFramePaths.current = paths.current;
 			
 			renderScene();
 		};
