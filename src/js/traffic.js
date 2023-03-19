@@ -125,6 +125,11 @@ function Path(obj) {
 			car.pos = 0 + sequentialPlacement.offset;
 			sequentialPlacement.prevPathCars.pop(); // remove car from source path
 		}
+
+		if(car.pos > 1) {
+			car.pos = 1; //temporary hacky "workaround". Timing won't be correct now :(
+			console.log("Due to excessive simulation delay/lag (caused by tab being inactive), the simulation is no longer accurate. Please reset");
+		}
 		
 		car.circle.position.set(this.curvePath.obj.getPoint(car.pos).x, this.curvePath.obj.getPoint(car.pos).y, 2);
 		this.cars.unshift(car); // Add car
