@@ -22,7 +22,7 @@ function App() {
 	let phaseStartTime = useRef(null);
 	var preTimedInterval = useRef(null);
 	var preTimedNumPhasesPassed = useRef(0);
-	const preTimedPhaseTime = 3400; //Example: (0.8/0.002)+((2+4)/0.003) for 4 cars at 0.002 speed.
+	const preTimedPhaseTime = 3400; //Example: (0.8/0.002)+((2+4)/0.002) for 4 cars at 0.002 speed.
 	let targetPhaseTime = useRef(preTimedPhaseTime);
 	var prevFramePaths = useRef(null);
 	var overshot = useRef(0);
