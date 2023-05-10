@@ -54,7 +54,7 @@ function Path(obj) {
 		for(let i=this.cars.length-1; i>=0;i--) {
 			let car = this.cars[i];
 
-			const speed = 0.002;
+			const speed = 0.001;
 			let oneUnitLength = 1/(this.curvePath.length);
 			let distanceToMoveThisFrame = (speed*delta)/(this.curvePath.length);
 			let lastPosInCurve = 1;
@@ -97,6 +97,15 @@ function Path(obj) {
 				car.pos = lastPossibleSpot;
 			}
 
+			if(this.id==6 && car.id==14 && car.pos>=0.895 && car.pos <=0.905) {
+				console.log("[3] 14 car pos:"+car.pos);
+			}
+			if(this.id==6 && car.id==15 && car.pos>=0.645 && car.pos <=0.655) {
+				console.log("[3] 15 car pos:"+car.pos);
+			}
+			if(this.id==6 && car.id==16 && car.pos>=0.395 && car.pos <=0.405) {
+				console.log("[3] 16 car pos:"+car.pos);
+			}
 			if(i===this.cars.length-1 && car.pos === lastPosInCurve) { // If is first car and has reached end of curve, move to next path
 				if(car.desiredDir in this.possiblePaths) { //if the next path exists
 					let nextPath = this.possiblePaths[car.desiredDir];
@@ -104,8 +113,8 @@ function Path(obj) {
 						let overshotEndOfPathBy = (car.pos + distanceToMoveThisFrame) - lastPossibleSpot;
 						let passOnOvershotToNextPath = (overshotEndOfPathBy*this.curvePath.length)/nextPath.curvePath.length;
 						
-						let sequentialPlacement = { prevPathCars: this.cars, offset: passOnOvershotToNextPath };
-						nextPath.placeCarAtStart(scene, car, sequentialPlacement); // add car to destination path
+						let placement = { prevPathCars: this.cars, offset: passOnOvershotToNextPath };
+						nextPath.placeCarAtStart(scene, car, placement); // add car to destination path
 						continue; // doing this as I don't want car being drawn on the current path object.
 					}
 				}
@@ -117,14 +126,13 @@ function Path(obj) {
 
 		}
 	}
-	this.placeCarAtStart = function(scene, car, sequentialPlacement = false) {
-		if(!sequentialPlacement) { // first/initial placement of car
-			car.pos = 0;
+	this.placeCarAtStart = function(scene, car, placement) {
+		if(placement.initialPlacement) {
 			scene.add(car.circle);
-		} else { //car going onto future path
-			car.pos = 0 + sequentialPlacement.offset;
-			sequentialPlacement.prevPathCars.pop(); // remove car from source path
 		}
+
+		car.pos = placement.offset;
+		placement.prevPathCars.pop(); // remove car from previous source path or initial array of cars.
 
 		if(car.pos > 1) {
 			car.pos = 1; //temporary hacky "workaround". Timing won't be correct now :(
