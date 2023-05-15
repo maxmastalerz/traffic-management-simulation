@@ -18,7 +18,7 @@ function App() {
 	const [simulationMode, setSimulationMode] = useState("Pre-timed"); //Pre-timed, Fully-actuated, Geolocation-enabled
 
 	let scene = useRef(null);
-	let paths = useRef(null);
+	let simState = useRef({carStopTimes: {}, paths: null, prevFramePaths: null});
 	let allowedPaths = useRef(null);
 	var keepTryingToPlaceCars = useRef(true);
 	let phaseStartTime = useRef(null);
@@ -29,15 +29,14 @@ function App() {
 									//or (0.8/0.001)+((2+3)/0.001) = 5800 for 3 cars at 0.001 speed.
 	const firstPhaseLength = 8600;
 	let targetPhaseTime = useRef(null); //Time for the first phase, perfect timing for west route car to arrive at intersection stop line.
-	var prevFramePaths = useRef(null);
 	var overshot = useRef(0);
 	//let phaseNum = 0;
 
 	//Go thru paths, get every car on these paths, remove their mesh memory(car circle) from the scene.
 	//Also clear the cars from the path(unless circleMemoryOnly is set)
 	const clearOldCarsFromPaths = (circleMemoryOnly = false) => {
-		if(paths.current) {
-			paths.current.forEach((path) => {
+		if(simState.current.paths) {
+			simState.current.paths.forEach((path) => {
 				path.cars.forEach((car) => {
 					scene.current.remove(car.circle);
 				});
@@ -77,13 +76,13 @@ function App() {
 		renderer.setPixelRatio(window.devicePixelRatio);
 
 		let bgItems = drawings.drawBg(scene.current, WorldSpaceWidth, WorldSpaceHeight);
-		paths.current = drawings.drawPaths(scene.current, WorldSpaceWidth, WorldSpaceHeight);
+		simState.current.paths = drawings.drawPaths(scene.current, WorldSpaceWidth, WorldSpaceHeight);
 
 		const sourcePathObjects = [
-			paths.current.filter((obj) => obj.id===1)[0],
-			paths.current.filter((obj) => obj.id===11)[0],
-			paths.current.filter((obj) => obj.id===21)[0],
-			paths.current.filter((obj) => obj.id===31)[0]
+			simState.current.paths.filter((obj) => obj.id===1)[0],
+			simState.current.paths.filter((obj) => obj.id===11)[0],
+			simState.current.paths.filter((obj) => obj.id===21)[0],
+			simState.current.paths.filter((obj) => obj.id===31)[0]
 		]
 
 		let carPlacements = [
@@ -162,7 +161,7 @@ function App() {
 			if(isNaN(delta)) {
 				//This makes sure all simulations are identical regardless of start time lag
 				targetPhaseTime.current = now + firstPhaseLength;
-				console.log("[0] now:"+now+"   target phase time:"+targetPhaseTime.current);
+				//console.log("[0] now:"+now+"   target phase time:"+targetPhaseTime.current);
 				
 				return; // skip very first delta to prevent jumping
 			}
@@ -191,16 +190,16 @@ function App() {
 					phaseStartTime.current = now;
 				}
 
-				console.log("[1] now:"+now+"   target phase time:"+targetPhaseTime.current);
+				//console.log("[1] now:"+now+"   target phase time:"+targetPhaseTime.current);
 				if(now >= targetPhaseTime.current) {
 					overshot.current = (now - targetPhaseTime.current);
 					preTimedNumPhasesPassed.current++;
-					console.log("[2] phase: "+preTimedNumPhasesPassed.current%4+" (started "+overshot.current+"ms late)");
+					//console.log("[2] phase: "+preTimedNumPhasesPassed.current%4+" (started "+overshot.current+"ms late)");
 					phaseStartTime.current = now;
 					//targetPhaseTime.current = (preTimedPhaseTime * (preTimedNumPhasesPassed.current + 1));
 					targetPhaseTime.current = targetPhaseTime.current + preTimedPhaseTime; //(preTimedPhaseTime * (preTimedNumPhasesPassed.current + 1));
 
-					console.log("Phase changed to: "+preTimedNumPhasesPassed.current);
+					//console.log("Phase changed to: "+preTimedNumPhasesPassed.current);
 				}
 
 				allowedPaths.current = preTimedPhases[(preTimedNumPhasesPassed.current)%4];
@@ -213,9 +212,9 @@ function App() {
 				return;
 			}
 
-			traffic.progressCars(paths.current, scene.current, prevFramePaths.current, delta, allowedPaths.current, timeTilNextPhase.current);
+			traffic.progressCars(simState.current, scene.current, delta, allowedPaths.current, timeTilNextPhase.current);
 
-			prevFramePaths.current = JSON.parse(JSON.stringify(paths.current)); //deep clone
+			simState.current.prevFramePaths = JSON.parse(JSON.stringify(simState.current.paths)); //deep clone
 			
 			renderScene();
 
@@ -254,7 +253,7 @@ function App() {
 			bgItems.geometries.forEach((bgGeometry) => {
 				bgGeometry.dispose();
 			});
-			paths.current.forEach((pathObj) => {
+			simState.current.paths.forEach((pathObj) => { // eslint-disable-line react-hooks/exhaustive-deps
 				scene.current.remove(pathObj.path);
 				pathObj.geometry.dispose();
 			});

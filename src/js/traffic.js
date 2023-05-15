@@ -51,7 +51,16 @@ function Path(obj) {
 			return closestCarPosAdjusted;
 		}
 	}
-	this.progressCars = function(scene, prevFramePaths, delta, allowedPaths, timeTilNextPhase) {
+	/*
+	Progress the cars found on said path segment.
+
+	Note about effects:
+	This function updates(by reference) the state of the simulation car stop times.
+	*/
+	this.progressCars = function(simState, scene, delta, allowedPaths, timeTilNextPhase) {
+		let { prevFramePaths } = simState;
+
+		let carStopTimesForPath = {};
 		for(let i=this.cars.length-1; i>=0;i--) {
 			let car = this.cars[i];
 
@@ -83,19 +92,6 @@ function Path(obj) {
 			}
 			
 			if(this.cars[i+1]) { //If there is a car in front of me on same path, the last possible spot is right behind that car
-
-				/*if(this.id===1) {
-					console.log("curr cars:")
-					console.log(this.cars);
-					this.cars.forEach((curr_cr) => {
-						console.log(curr_cr);
-					});
-					console.log("prev cars:");
-					prevFramePath.cars.forEach((cr) => {
-						console.log(cr);
-					});
-				}*/
-
 				lastPossibleSpot = this.cars[i+1].pos - oneUnitLength; //using same frame
 				//let prevFramePath = prevFramePaths.filter((prevFramePath) => prevFramePath.id === this.id)[0]; //old code
 				//lastPossibleSpot = prevFramePath.cars[i+1].pos - oneUnitLength; //old code when prevFramePath wasn't actually previous due to not having deep cloning
@@ -111,12 +107,6 @@ function Path(obj) {
 				car.pos += distanceToMoveThisFrame;
 			} else {//just move it up the furthest position it can get
 				car.pos = lastPossibleSpot;
-				//console.log("PATH ID: "+this.id+" / "+car.id+":"+car.pos+" vs "+prevFramePath.cars[i].id+":"+prevFramePath.cars[i].pos);
-				//console.log("prev frame path. i="+i);
-				/*prevFramePath.cars.forEach((cr) => {
-					console.log(cr);
-				});*/
-
 			}
 
 			/*if(this.id==6 && car.id==14 && car.pos>=0.895 && car.pos <=0.905) {
@@ -152,12 +142,15 @@ function Path(obj) {
 			let prevFramePathCar = prevFramePath.cars.filter((prevFramePathCar) => prevFramePathCar.id === car.id)[0];
 			if(prevFramePathCar && car.pos === prevFramePathCar.pos) { //If the car was on this path last frame and if car hasn't moved since then,
 				car.timeSpentStopped += delta;
+				carStopTimesForPath[car.id] = car.timeSpentStopped;
 				//if(car.id===4 || car.id===5) {
-					console.log("Car "+car.id+" hasn't moved since last frame. stoppedTime += "+delta+" = "+car.timeSpentStopped);
+				//console.log("Car "+car.id+" hasn't moved since last frame. stoppedTime += "+delta+" = "+car.timeSpentStopped);
 				//}
 			}
 
 		}
+
+		simState.carStopTimes = Object.assign(simState.carStopTimes, carStopTimesForPath);
 	}
 	this.placeCarAtStart = function(scene, car, placement) {
 		if(placement.initialPlacement) {
@@ -183,10 +176,13 @@ function Path(obj) {
 	}
 }
 
-function progressCars(paths, scene, prevFramePaths, delta, allowedPaths, timeTilNextPhase) {
+function progressCars(simState, scene, delta, allowedPaths, timeTilNextPhase) {
+	let { carStopTimes, paths } = simState;
+
 	paths.forEach((path) => {
-		path.progressCars(scene, prevFramePaths, delta, allowedPaths, timeTilNextPhase);
+		path.progressCars(simState, scene, delta, allowedPaths, timeTilNextPhase);
 	})
+	console.log(carStopTimes);
 }
 
 let obj = { Car, Path, progressCars, carGeometry, carMaterials };
