@@ -16,6 +16,7 @@ function Car(obj) {
 	this.id = obj.id;
 	this.desiredDir = obj.desiredDir;
 	this.pos = obj.pos;
+	this.timeSpentStopped = 0;
 	this.circle = new Mesh( carGeometry, carMaterials[this.desiredDir] );
 }
 
@@ -81,9 +82,24 @@ function Path(obj) {
 				}
 			}
 			
-			if(this.cars[i+1]) { //If there is a car in front of me on same path, the last possible spot is right behind that car(based on where he was last frame).
-				let prevFramePath = prevFramePaths.filter((prevFramePath) => prevFramePath.id === this.id)[0];
-				lastPossibleSpot = prevFramePath.cars[i+1].pos - oneUnitLength;
+			if(this.cars[i+1]) { //If there is a car in front of me on same path, the last possible spot is right behind that car
+
+				/*if(this.id===1) {
+					console.log("curr cars:")
+					console.log(this.cars);
+					this.cars.forEach((curr_cr) => {
+						console.log(curr_cr);
+					});
+					console.log("prev cars:");
+					prevFramePath.cars.forEach((cr) => {
+						console.log(cr);
+					});
+				}*/
+
+				lastPossibleSpot = this.cars[i+1].pos - oneUnitLength; //using same frame
+				//let prevFramePath = prevFramePaths.filter((prevFramePath) => prevFramePath.id === this.id)[0]; //old code
+				//lastPossibleSpot = prevFramePath.cars[i+1].pos - oneUnitLength; //old code when prevFramePath wasn't actually previous due to not having deep cloning
+
 			} else if(!stoppedAtIntersection) { //If I'm the first car on the path, there might be an interfering car in front of me on a next path.
 				let nearestCarInNextPathsPos = this.nearestInterferingCarInNextPaths(car.pos);
 				if(nearestCarInNextPathsPos) {
@@ -95,9 +111,15 @@ function Path(obj) {
 				car.pos += distanceToMoveThisFrame;
 			} else {//just move it up the furthest position it can get
 				car.pos = lastPossibleSpot;
+				//console.log("PATH ID: "+this.id+" / "+car.id+":"+car.pos+" vs "+prevFramePath.cars[i].id+":"+prevFramePath.cars[i].pos);
+				//console.log("prev frame path. i="+i);
+				/*prevFramePath.cars.forEach((cr) => {
+					console.log(cr);
+				});*/
+
 			}
 
-			if(this.id==6 && car.id==14 && car.pos>=0.895 && car.pos <=0.905) {
+			/*if(this.id==6 && car.id==14 && car.pos>=0.895 && car.pos <=0.905) {
 				console.log("[3] 14 car pos:"+car.pos);
 			}
 			if(this.id==6 && car.id==15 && car.pos>=0.645 && car.pos <=0.655) {
@@ -105,7 +127,7 @@ function Path(obj) {
 			}
 			if(this.id==6 && car.id==16 && car.pos>=0.395 && car.pos <=0.405) {
 				console.log("[3] 16 car pos:"+car.pos);
-			}
+			}*/
 			if(i===this.cars.length-1 && car.pos === lastPosInCurve) { // If is first car and has reached end of curve, move to next path
 				if(car.desiredDir in this.possiblePaths) { //if the next path exists
 					let nextPath = this.possiblePaths[car.desiredDir];
@@ -122,7 +144,18 @@ function Path(obj) {
 
 			const newPosition = this.curvePath.obj.getPoint(car.pos);
 			car.circle.position.set(newPosition.x, newPosition.y, 2);
-			//const tangent = this.curvePath.obj.getTangent(fraction);
+			//const tangent = this.curvePath.obj.getTangent(fraction); //Not implemented.
+
+			let prevFramePath = prevFramePaths.filter((prevFramePath) => prevFramePath.id === this.id)[0];
+			//prevframe path is accurate for the specific car being iterated right now.
+			//the last car in the path segment has the best picture of where cars were last frame.
+			let prevFramePathCar = prevFramePath.cars.filter((prevFramePathCar) => prevFramePathCar.id === car.id)[0];
+			if(prevFramePathCar && car.pos === prevFramePathCar.pos) { //If the car was on this path last frame and if car hasn't moved since then,
+				car.timeSpentStopped += delta;
+				//if(car.id===4 || car.id===5) {
+					console.log("Car "+car.id+" hasn't moved since last frame. stoppedTime += "+delta+" = "+car.timeSpentStopped);
+				//}
+			}
 
 		}
 	}

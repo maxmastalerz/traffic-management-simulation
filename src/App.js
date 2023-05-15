@@ -88,23 +88,25 @@ function App() {
 
 		let carPlacements = [
 			[//will be placed on path 1
-				new traffic.Car({id: 23, desiredDir: 'e'}), // last car to appear
-				new traffic.Car({id: 22, desiredDir: 'e'}),
-				new traffic.Car({id: 21, desiredDir: 'e'}),
-				new traffic.Car({id: 20, desiredDir: 'e'}),
-				new traffic.Car({id: 19, desiredDir: 'e'}),
-				new traffic.Car({id: 18, desiredDir: 'e'}),
-				new traffic.Car({id: 17, desiredDir: 'e'}),
-				new traffic.Car({id: 16, desiredDir: 'e'}),
-				new traffic.Car({id: 15, desiredDir: 'e'}),
-				new traffic.Car({id: 14, desiredDir: 'e'}), // first car to appear
+				new traffic.Car({id: 5, desiredDir: 'e'}),
+				new traffic.Car({id: 4, desiredDir: 'e'}),
+				new traffic.Car({id: 3, desiredDir: 'e'}),
+				new traffic.Car({id: 2, desiredDir: 'e'}),
+				new traffic.Car({id: 1, desiredDir: 'e'}), // first car to appear
 			],
 			[//will be placed on path 11
-
+				new traffic.Car({id: 9, desiredDir: 'e'}),
+				new traffic.Car({id: 8, desiredDir: 'e'}),
+				new traffic.Car({id: 7, desiredDir: 'e'}),
+				new traffic.Car({id: 6, desiredDir: 'e'}), // first car to appear
 			],
 			[//will be placed on path 21
 			],
 			[//will be placed on path 31
+				new traffic.Car({id: 13, desiredDir: 'w'}),
+				new traffic.Car({id: 12, desiredDir: 'w'}),
+				new traffic.Car({id: 11, desiredDir: 'w'}),
+				new traffic.Car({id: 10, desiredDir: 'w'}), // first car to appear
 			]
 		]
 
@@ -197,6 +199,8 @@ function App() {
 					phaseStartTime.current = now;
 					//targetPhaseTime.current = (preTimedPhaseTime * (preTimedNumPhasesPassed.current + 1));
 					targetPhaseTime.current = targetPhaseTime.current + preTimedPhaseTime; //(preTimedPhaseTime * (preTimedNumPhasesPassed.current + 1));
+
+					console.log("Phase changed to: "+preTimedNumPhasesPassed.current);
 				}
 
 				allowedPaths.current = preTimedPhases[(preTimedNumPhasesPassed.current)%4];
@@ -211,7 +215,7 @@ function App() {
 
 			traffic.progressCars(paths.current, scene.current, prevFramePaths.current, delta, allowedPaths.current, timeTilNextPhase.current);
 
-			prevFramePaths.current = paths.current;
+			prevFramePaths.current = JSON.parse(JSON.stringify(paths.current)); //deep clone
 			
 			renderScene();
 
