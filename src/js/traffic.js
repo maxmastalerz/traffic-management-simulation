@@ -51,6 +51,17 @@ function Path(obj) {
 			return closestCarPosAdjusted;
 		}
 	}
+
+	//This should only be run for exit paths(paths a car is on when they're exiting the simulation)
+	//Once the car is at the end of an "exit" path, we can remove the car
+	this.removeCar = function(scene, carId) {
+		let car = this.cars.filter(car => car.id === carId)[0];
+		if(car) {
+			scene.remove(car.circle); // remove car circle from scene
+		}
+
+		this.cars = this.cars.filter(car => car.id !== carId); // remove car from path.
+	}
 	/*
 	Progress the cars found on said path segment.
 
@@ -129,6 +140,9 @@ function Path(obj) {
 						nextPath.placeCarAtStart(scene, car, placement); // add car to destination path
 						continue; // doing this as I don't want car being drawn on the current path object.
 					}
+				} else {
+					console.log("Removing car "+car.id+" from the simulation. This car spent "+car.timeSpentStopped+"ms stopped.");
+					this.removeCar(scene, car.id);
 				}
 			}
 
@@ -136,18 +150,20 @@ function Path(obj) {
 			car.circle.position.set(newPosition.x, newPosition.y, 2);
 			//const tangent = this.curvePath.obj.getTangent(fraction); //Not implemented.
 
-			let prevFramePath = prevFramePaths.filter((prevFramePath) => prevFramePath.id === this.id)[0];
-			//prevframe path is accurate for the specific car being iterated right now.
-			//the last car in the path segment has the best picture of where cars were last frame.
-			let prevFramePathCar = prevFramePath.cars.filter((prevFramePathCar) => prevFramePathCar.id === car.id)[0];
-			if(prevFramePathCar && car.pos === prevFramePathCar.pos) { //If the car was on this path last frame and if car hasn't moved since then,
-				car.timeSpentStopped += delta;
-				carStopTimesForPath[car.id] = car.timeSpentStopped;
-				//if(car.id===4 || car.id===5) {
-				//console.log("Car "+car.id+" hasn't moved since last frame. stoppedTime += "+delta+" = "+car.timeSpentStopped);
-				//}
+			if(prevFramePaths) {//check in case prev frame paths is null like it would be on the very first frame.
+				let prevFramePath = prevFramePaths.filter((prevFramePath) => prevFramePath.id === this.id)[0];
+				//prevframe path is accurate for the specific car being iterated right now.
+				//the last car in the path segment has the best picture of where cars were last frame.
+				let prevFramePathCar = prevFramePath.cars.filter((prevFramePathCar) => prevFramePathCar.id === car.id)[0];
+				if(prevFramePathCar && car.pos === prevFramePathCar.pos) { //If the car was on this path last frame and if car hasn't moved since then,
+					car.timeSpentStopped += delta;
+					//if(car.id===4 || car.id===5) {
+					//console.log("Car "+car.id+" hasn't moved since last frame. stoppedTime += "+delta+" = "+car.timeSpentStopped);
+					//}
+				}
 			}
 
+			carStopTimesForPath[car.id] = car.timeSpentStopped;
 		}
 
 		simState.carStopTimes = Object.assign(simState.carStopTimes, carStopTimesForPath);
@@ -177,12 +193,11 @@ function Path(obj) {
 }
 
 function progressCars(simState, scene, delta, allowedPaths, timeTilNextPhase) {
-	let { carStopTimes, paths } = simState;
+	let { paths } = simState;
 
 	paths.forEach((path) => {
 		path.progressCars(simState, scene, delta, allowedPaths, timeTilNextPhase);
 	})
-	console.log(carStopTimes);
 }
 
 let obj = { Car, Path, progressCars, carGeometry, carMaterials };

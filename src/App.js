@@ -14,11 +14,10 @@ function App() {
 	const startTime = useRef(undefined);
 	const prevTime = useRef(undefined);
 	const simulationModeLastTick = useRef("Pre-timed");
-	const simulationModeChangedLastTick = useRef(false);
 	const [simulationMode, setSimulationMode] = useState("Pre-timed"); //Pre-timed, Fully-actuated, Geolocation-enabled
 
 	let scene = useRef(null);
-	let simState = useRef({carStopTimes: {}, paths: null, prevFramePaths: null});
+	let simState = useRef({carStopTimes: {}, paths: null, prevFramePaths: null, printedSimResults: false});
 	let allowedPaths = useRef(null);
 	var keepTryingToPlaceCars = useRef(true);
 	let phaseStartTime = useRef(null);
@@ -27,7 +26,7 @@ function App() {
 	var preTimedNumPhasesPassed = useRef(0);
 	const preTimedPhaseTime = 5800; //Example: (0.8/0.002)+((2+4)/0.002) = 3400 for 4 cars at 0.002 speed.
 									//or (0.8/0.001)+((2+3)/0.001) = 5800 for 3 cars at 0.001 speed.
-	const firstPhaseLength = 8600;
+	const firstPhaseLength = 8600;//8600 for cars coming from east/west. 6083 = (5+1.4952713686069787-0.4)*1000 for cars from north/south
 	let targetPhaseTime = useRef(null); //Time for the first phase, perfect timing for west route car to arrive at intersection stop line.
 	var overshot = useRef(0);
 	//let phaseNum = 0;
@@ -47,10 +46,17 @@ function App() {
 		}
 	};
 
+	/*This makes sure that on remount(for example, when you live reload code), that the simulation phases run from the beggining.*/
+	const resetSimSettings = (now) => {
+		preTimedNumPhasesPassed.current = 0;
+		prevTime.current = undefined;
+	}
+
 	const resetCars = () => {
 		clearOldCarsFromPaths();
 		if(keepTryingToPlaceCars.current === false) { //fix left over from previous simulation (if one occured)
 			keepTryingToPlaceCars.current = true;
+			simState.current.printedSimResults = false;
 		}
 	};
 
@@ -116,6 +122,7 @@ function App() {
 			[17,19,37,39]
 		];
 
+		resetSimSettings();
 		resetCars(); // since the simulation mode changed, reset the cars in the simulation
 
 		const renderScene = () => {
@@ -133,16 +140,13 @@ function App() {
 		/*
 		Tries placing one of the cars from the simulation initilization onto one of the first cardinal paths.
 		*/
-		const tryPlacingNextInitialCar = (delta) => {
+		const tryPlacingNextInitialCar = () => {
 			for(let i=0;i<4;i++) {//for each of the cardinal directions
 				let carsToPlace = carPlacements[i];
 
 				if(carsToPlace.length > 0) {
 					if(sourcePathObjects[i].canPlaceCar()) {
-						let speed = 0.001;
-						let distanceToMoveThisFrame = (speed*delta)/(sourcePathObjects[i].curvePath.length);
-						let placement = { prevPathCars: carsToPlace, offset: distanceToMoveThisFrame, initialPlacement: true };
-
+						let placement = { prevPathCars: carsToPlace, offset: 0, initialPlacement: true };
 						sourcePathObjects[i].placeCarAtStart(scene.current, carsToPlace[carsToPlace.length-1], placement);
 					}
 				}
@@ -150,6 +154,18 @@ function App() {
 			if(carPlacements[0].length + carPlacements[1].length + carPlacements[2].length + carPlacements[3].length === 0) { // all cars placed
 				keepTryingToPlaceCars.current = false;
 			}
+		}
+
+		const carsLeftOnPaths = (paths) => {
+			let numCars = 0;
+			paths.forEach((path) => {
+				numCars += path.cars.length;
+			});
+
+			if(numCars > 0) {
+				return true;
+			}
+			return false;
 		}
 
 		const tick = (now) => {
@@ -171,13 +187,7 @@ function App() {
 				timeTilNextPhase.current = null;
 				preTimedNumPhasesPassed.current = 0;
 				targetPhaseTime.current = now + firstPhaseLength;
-				targetPhaseTime.current = targetPhaseTime.current - delta;
-				simulationModeChangedLastTick.current = true;
 				return;
-			}
-			if(simulationModeChangedLastTick.current === true) {
-				targetPhaseTime.current = targetPhaseTime.current + delta;
-				simulationModeChangedLastTick.current = false;
 			}
 
 			if(startTime.current === undefined) {
@@ -212,15 +222,32 @@ function App() {
 				return;
 			}
 
-			traffic.progressCars(simState.current, scene.current, delta, allowedPaths.current, timeTilNextPhase.current);
+			if(keepTryingToPlaceCars.current === true) {
+				tryPlacingNextInitialCar();
+			}
 
-			simState.current.prevFramePaths = JSON.parse(JSON.stringify(simState.current.paths)); //deep clone
+			if(carsLeftOnPaths(simState.current.paths)) {
+				traffic.progressCars(simState.current, scene.current, delta, allowedPaths.current, timeTilNextPhase.current);
+				simState.current.prevFramePaths = JSON.parse(JSON.stringify(simState.current.paths)); //store paths from last frame (deep clone)
+			} else {
+				if(simState.current.printedSimResults === false) {
+					console.log("Finished simulating. Car stop times:");
+					console.log(simState.current.carStopTimes);
+
+					let totalStopTime = 0;
+					for(let carId in simState.current.carStopTimes) {
+						totalStopTime += simState.current.carStopTimes[carId];
+					}
+					let averageStopTime = totalStopTime/Object.keys(simState.current.carStopTimes).length;
+
+					console.log(`Total time spent stopped by all cars: ${totalStopTime/1000}s.`);
+					console.log(`Average time spent stopped by a car: ${averageStopTime/1000}s.`);
+
+					simState.current.printedSimResults = true;
+				}
+			}
 			
 			renderScene();
-
-			if(keepTryingToPlaceCars.current === true) {
-				tryPlacingNextInitialCar(delta);
-			}
 		};
 
 		const start = () => {
@@ -269,11 +296,6 @@ function App() {
 			}
 			drawings.squareGeometry.dispose();
 		}
-	}, [simulationMode]); // eslint-disable-line react-hooks/exhaustive-deps
-
-	useEffect(() => {
-
-		
 	}, [simulationMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	return (
