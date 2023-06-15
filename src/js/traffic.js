@@ -31,26 +31,162 @@ function Path(obj) {
 
 	this.cars = [];
 	this.possiblePaths = obj.possiblePaths;
+	this.prevPath = obj.prevPath;
+
+	/*Does very similar logic as getNumImmediateFollowersDetermistic,
+	except it continues the search further past the deterministic paths where a cars desired direction is unknown,
+	for those cars that are immediate followers we can add them to the total followers but we weight them.
+	33.33% for the left turning phase, 66.67% for the straight and right phases.
+	*/
+	this.getNumImmediateFollowersEsimatedPastDeterministic = (pos, idOfStartPath) => {
+		let numFollowers = 0;
+		let oneUnitLength = 1/(this.curvePath.length);
+
+		for(let i=this.cars.length-1;i>=0;i--) {
+			let car = this.cars[i];
+
+			let lookbackPos = pos-oneUnitLength;
+			if(car.id===1) {
+				//debugger;
+			}
+			if(car.pos >= lookbackPos && car.pos < pos) { /*first run would be : >= 0.65 && < 0.9, or >= 0.5333333336666667 && < 0.8666666666666667 */
+				let weightOfCar = 1;
+				if(this.id === 1 && Number((idOfStartPath+"")[(idOfStartPath+"").length-1]) === 3) {
+					weightOfCar = 0;
+				} else if(this.id === 1 && Number((idOfStartPath+"")[(idOfStartPath+"").length-1]) === 6) {
+					weightOfCar = 1;
+				}
+
+				numFollowers = this.getNumImmediateFollowersEsimatedPastDeterministic(lookbackPos, idOfStartPath) + weightOfCar;
+				break;//found the car we were looking for, no need to search further
+			} else if(lookbackPos > 0 && i===0 && [2,3,6].includes(Number((this.id+"")[(this.id+"").length-1]))/* && car.pos <= pos*/){ // else is hit if there is a gap on my path(aka, path isn't filled up fully with cars)
+				//console.log("gap found");
+				//debugger;
+				let pathx1 = null;
+				if(Number((this.id+"")[(this.id+"").length-1]) === 3) {
+					pathx1 = this.prevPath.prevPath;
+				} else if([2,6].includes(Number((this.id+"")[(this.id+"").length-1]))) {
+					pathx1 = this.prevPath;
+				}
+
+				//if checks if there's a car on path x2 or x6 that could be blocking others on path 1.
+				//Add the cars blocked on path 1 in a weighted manner.
+				let nearestNextCarToPath1 = pathx1.nearestInterferingCarInNextPaths();
+
+				if(nearestNextCarToPath1 && nearestNextCarToPath1.path.id !== this.id) {//If blocked by a another path, some of my own cars might be blocked, let's weigh them as followers.
+					let weightOfCar = 0;
+					if(Number((idOfStartPath+"")[(idOfStartPath+"").length-1]) === 3) {
+						weightOfCar = 0;
+					} else if(Number((idOfStartPath+"")[(idOfStartPath+"").length-1]) === 6) {
+						weightOfCar = 1;
+					}
+
+					//todo possible improvement: technically not length, but immediate cars(works well as long as there are no gaps between cars when first placing).
+					numFollowers = weightOfCar*pathx1.cars.length;
+					break;
+				}
+			}
+
+			//If we haven't found it yet, it might be in a previous path:
+			if(lookbackPos < 0 && this.prevPath !== undefined) {//keep in mind "x"3's previous path: 2.
+				//if prevPath is 2,12,22,32
+				let prevPathLookbackPos = 1-((Math.abs(lookbackPos)*this.curvePath.length)*(1/this.prevPath.curvePath.length));
+
+				if(Number((this.prevPath.id+"")[(this.prevPath.id+"").length-1]) === 2) {//The only previous path which is deterministic is the one with id=2
+					
+					//console.log("looking at prevpath: "+this.prevPath.id+" . LookbackPos is: "+prevPathLookbackPos);
+					let lastCarInPrevPath = this.prevPath.cars[this.prevPath.cars.length-1];
+					if(lastCarInPrevPath && mathHelpers.epsGreaterThanEqual(lastCarInPrevPath.pos, prevPathLookbackPos) && lastCarInPrevPath.pos <= 1) {//only if we are sure there is a car there, can we add it, and search further.
+						numFollowers = this.prevPath.getNumImmediateFollowersEsimatedPastDeterministic(prevPathLookbackPos-Number.EPSILON, idOfStartPath) + 1;
+					}
+					break;
+				} else { //path "x"1
+					let lastCarInPrevPath = this.prevPath.cars[this.prevPath.cars.length-1];
+					let weightOfCar = 1;
+					if(this.prevPath.id === 1 && Number((idOfStartPath+"")[(idOfStartPath+"").length-1]) === 3) {
+						weightOfCar = 0;
+					} else if(this.prevPath.id === 1 && Number((idOfStartPath+"")[(idOfStartPath+"").length-1]) === 6) {
+						weightOfCar = 1;
+					}
+
+					if(lastCarInPrevPath && mathHelpers.epsGreaterThanEqual(lastCarInPrevPath.pos, prevPathLookbackPos) && lastCarInPrevPath.pos <= 1) {//only if we are sure there is a car there, can we add it, and search further.
+						numFollowers = this.prevPath.getNumImmediateFollowersEsimatedPastDeterministic(prevPathLookbackPos-Number.EPSILON, idOfStartPath) + weightOfCar;
+					}
+					break;
+
+				}
+				
+			}
+		}
+
+		return numFollowers;
+	}
+
+	/*Gets number of followers on the path behind a car at a certain position
+	Only looks back at paths that are determistic to the phasing algorithm: AKA, if you look at path 1(as a human),
+	you don't know if those cars want to go straight/right or left. Though obviously in our simulation, we do know
+	where they are going because they are colour coded.
+	*/
+	this.getNumImmediateFollowersDetermistic = (pos) => {
+		let numFollowers = 0;
+		let oneUnitLength = 1/(this.curvePath.length);
+
+		for(let i=this.cars.length-1;i>=0;i--) {
+			let car = this.cars[i];
+
+			let lookbackPos = pos-oneUnitLength;
+			if(car.pos >= lookbackPos && car.pos < pos) { /*first run would be : >= 0.65 && < 0.9, or >= 0.5333333336666667 && < 0.8666666666666667 */
+				numFollowers = this.getNumImmediateFollowersDetermistic(lookbackPos) + 1;
+				break;//found the car we were looking for, no need to search further
+			}
+
+			//If we haven't found it yet, it might be in a previous path:
+			if(lookbackPos < 0) {//keep in mind "x"3's previous path: 2.
+				if(Number((this.prevPath.id+"")[(this.prevPath.id+"").length-1]) === 2) {//The only previous path which is deterministic is the one with id=2
+					let prevPathLookbackPos = 1-((Math.abs(lookbackPos)*this.curvePath.length)*(1/this.prevPath.curvePath.length));
+					let lastCarInPrevPath = this.prevPath.cars[this.prevPath.cars.length-1];
+					if(lastCarInPrevPath && mathHelpers.epsGreaterThanEqual(lastCarInPrevPath.pos, prevPathLookbackPos) && lastCarInPrevPath.pos <= 1) {//only if we are sure there is a car there, can we add it, and search further.
+						numFollowers = this.prevPath.getNumImmediateFollowersDetermistic(prevPathLookbackPos-Number.EPSILON) + 1;
+					}
+				}
+				
+			}
+		}
+
+		return numFollowers;
+	};
 
 	/*
 	Looks at the next paths car could go to and sees if there is a car in the way.
 	Returns the position of the nearest car on a next path such that we can stop the following car
 	before the end of it's own path to maintain a padding between cars across paths.
 	*/
-	this.nearestInterferingCarInNextPaths = function(pos) {
+	this.nearestInterferingCarInNextPaths = () => {
 		let oneUnitLength = 1/(this.curvePath.length);
 
 		let carsInFrontPosAdjusted = []; //adjusted to units based on the this.curvePath length
 		for(let possiblePath in this.possiblePaths) {
 			if(this.possiblePaths[possiblePath].cars[0]) {
-				carsInFrontPosAdjusted.push((this.possiblePaths[possiblePath].cars[0].pos*this.possiblePaths[possiblePath].curvePath.length)/this.curvePath.length);
+				carsInFrontPosAdjusted.push({
+					distance: (this.possiblePaths[possiblePath].cars[0].pos*this.possiblePaths[possiblePath].curvePath.length)/this.curvePath.length,
+					path: this.possiblePaths[possiblePath]
+				});
 			}
 		};
-		let closestCarPosAdjusted = Math.min(...carsInFrontPosAdjusted);
-		if(closestCarPosAdjusted < oneUnitLength) {
-			return closestCarPosAdjusted;
+
+		if(carsInFrontPosAdjusted.length) {
+			let closestCarPosAdjusted = carsInFrontPosAdjusted.reduce((accum, curr) => {
+				if(accum.distance < curr.distance) {
+					return accum;
+				}
+				return curr;
+			});
+
+			if(closestCarPosAdjusted.distance < oneUnitLength) {
+				return closestCarPosAdjusted;
+			}
 		}
-	}
+	};
 
 	//This should only be run for exit paths(paths a car is on when they're exiting the simulation)
 	//Once the car is at the end of an "exit" path, we can remove the car
@@ -108,16 +244,17 @@ function Path(obj) {
 				//lastPossibleSpot = prevFramePath.cars[i+1].pos - oneUnitLength; //old code when prevFramePath wasn't actually previous due to not having deep cloning
 
 			} else if(!stoppedAtIntersection) { //If I'm the first car on the path, there might be an interfering car in front of me on a next path.
-				let nearestCarInNextPathsPos = this.nearestInterferingCarInNextPaths(car.pos);
+				let nearestCarInNextPathsPos = this.nearestInterferingCarInNextPaths();
 				if(nearestCarInNextPathsPos) {
-					lastPossibleSpot = 1-(oneUnitLength-nearestCarInNextPathsPos); //Go oneUnitLength behind the car on the next path.
+					lastPossibleSpot = 1-(oneUnitLength-nearestCarInNextPathsPos.distance); //Go oneUnitLength behind the car on the next path.
 				}
 			}
 			
+			let savedCarPos = car.pos;
 			if(car.pos + distanceToMoveThisFrame <= lastPossibleSpot) {
 				car.pos += distanceToMoveThisFrame;
 			} else {//just move it up the furthest position it can get
-				car.pos = lastPossibleSpot;
+				car.pos = lastPossibleSpot; //Note: If lastPossibleSpot is 1, it will just be overwritten below as the car will go onto the next path
 			}
 
 			/*if(this.id==6 && car.id==14 && car.pos>=0.895 && car.pos <=0.905) {
@@ -133,7 +270,8 @@ function Path(obj) {
 				if(car.desiredDir in this.possiblePaths) { //if the next path exists
 					let nextPath = this.possiblePaths[car.desiredDir];
 					if(nextPath.canPlaceCar()) {
-						let overshotEndOfPathBy = (car.pos + distanceToMoveThisFrame) - lastPossibleSpot;
+						let overshotEndOfPathBy = (savedCarPos + distanceToMoveThisFrame) - lastPossibleSpot;
+						//console.log("[2] delta:"+delta+" overshotEndOfPathBy = ("+car.pos+" + "+distanceToMoveThisFrame+") - "+lastPossibleSpot);
 						let passOnOvershotToNextPath = (overshotEndOfPathBy*this.curvePath.length)/nextPath.curvePath.length;
 						
 						let placement = { prevPathCars: this.cars, offset: passOnOvershotToNextPath };

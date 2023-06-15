@@ -356,8 +356,17 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 
 	}
 
+
 	//Display paths in scene
 	paths.forEach((pathObj) => {
+		if([2,3,4,5,7,8,10].includes(Number((pathObj.id+"")[(pathObj.id+"").length-1]))) {
+			pathObj.prevPath = paths.filter((obj) => obj.id===pathObj.id-1)[0];
+		} else if(Number((pathObj.id+"")[(pathObj.id+"").length-1]) === 6) {
+			pathObj.prevPath = paths.filter((obj) => obj.id===pathObj.id-5)[0];
+		} else if(Number((pathObj.id+"")[(pathObj.id+"").length-1]) === 9) {
+			pathObj.prevPath = paths.filter((obj) => obj.id===pathObj.id-3)[0];
+		}
+
 		scene.add(pathObj.path);
 	});
 

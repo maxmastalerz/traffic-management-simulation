@@ -11,14 +11,14 @@ import traffic from "./js/traffic";
 function App() {
 	const mount = useRef(null);
 	const requestIdRef = useRef(null);
-	const startTime = useRef(undefined);
+	//const startTime = useRef(undefined);
 	const prevTime = useRef(undefined);
-	const simulationModeLastTick = useRef("Pre-timed");
+	const simulationModeLastSeen = useRef("Pre-timed");
 	const [simulationMode, setSimulationMode] = useState("Pre-timed"); //Pre-timed, Fully-actuated, Geolocation-enabled
 
 	let scene = useRef(null);
 	let simState = useRef({carStopTimes: {}, paths: null, prevFramePaths: null, printedSimResults: false});
-	let allowedPaths = useRef(null);
+	let allowedPaths = useRef([]);
 	var keepTryingToPlaceCars = useRef(true);
 	let phaseStartTime = useRef(null);
 	//var preTimedInterval = useRef(null);
@@ -28,6 +28,9 @@ function App() {
 									//or (0.8/0.001)+((2+3)/0.001) = 5800 for 3 cars at 0.001 speed.
 	const firstPhaseLength = 8600;//8600 for cars coming from east/west. 6083 = (5+1.4952713686069787-0.4)*1000 for cars from north/south
 	let targetPhaseTime = useRef(null); //Time for the first phase, perfect timing for west route car to arrive at intersection stop line.
+	let couldCalcGeolocationPhasing = useRef(false);
+	let canDoEarlyCalc = useRef(true);
+	let canDoRegularCalc = useRef(false);
 	var overshot = useRef(0);
 	//let phaseNum = 0;
 
@@ -48,7 +51,7 @@ function App() {
 
 	/*This makes sure that on remount(for example, when you live reload code), that the simulation phases run from the beggining.*/
 	const resetSimSettings = (now) => {
-		preTimedNumPhasesPassed.current = 0;
+		phaseStartTime.current = null;
 		prevTime.current = undefined;
 	}
 
@@ -59,6 +62,37 @@ function App() {
 			simState.current.printedSimResults = false;
 		}
 	};
+
+	const generateCarPlacements = () => {
+		let carPlacements = [
+			[//will be placed on path 1
+			],
+			[//will be placed on path 11
+			],
+			[//will be placed on path 21
+			],
+			[//will be placed on path 31
+			]
+		];
+		let numWCars = Math.floor(Math.random()*9)+1;
+		let numNCars = Math.floor(Math.random()*6)+1;
+		let numECars = Math.floor(Math.random()*9)+1;
+		let numSCars = Math.floor(Math.random()*6)+1;
+		for(let i=0; i<numWCars; i++) {
+			carPlacements[0].unshift(new traffic.Car({id: i+1, desiredDir: ['n','e','s'][Math.floor(Math.random()*3)]}));
+		}
+		for(let i=0; i<numNCars; i++) {
+			carPlacements[1].unshift(new traffic.Car({id: numWCars+i+1, desiredDir: ['e','s','w'][Math.floor(Math.random()*3)]}));
+		}
+		for(let i=0; i<numECars; i++) {
+			carPlacements[2].unshift(new traffic.Car({id: numWCars+numNCars+i+1, desiredDir: ['n','s','w'][Math.floor(Math.random()*3)]}));
+		}
+		for(let i=0; i<numSCars; i++) {
+			carPlacements[3].unshift(new traffic.Car({id: numWCars+numNCars+numECars+i+1, desiredDir: ['n','e','w'][Math.floor(Math.random()*3)]}));
+		}
+
+		return carPlacements;
+	}
 
 	useEffect(() => {
 		let mnt = mount.current;
@@ -83,6 +117,7 @@ function App() {
 
 		let bgItems = drawings.drawBg(scene.current, WorldSpaceWidth, WorldSpaceHeight);
 		simState.current.paths = drawings.drawPaths(scene.current, WorldSpaceWidth, WorldSpaceHeight);
+		let pathsLeadingUpToInt = simState.current.paths.filter((obj) => [3,6,13,16,23,26,33,36].includes(obj.id));
 
 		const sourcePathObjects = [
 			simState.current.paths.filter((obj) => obj.id===1)[0],
@@ -92,32 +127,60 @@ function App() {
 		]
 
 		let carPlacements = [
-			[//will be placed on path 1
-				new traffic.Car({id: 5, desiredDir: 'e'}),
-				new traffic.Car({id: 4, desiredDir: 'e'}),
-				new traffic.Car({id: 3, desiredDir: 'e'}),
+			[
 				new traffic.Car({id: 2, desiredDir: 'e'}),
-				new traffic.Car({id: 1, desiredDir: 'e'}), // first car to appear
+				new traffic.Car({id: 1, desiredDir: 'e'})
 			],
-			[//will be placed on path 11
-				new traffic.Car({id: 9, desiredDir: 'e'}),
-				new traffic.Car({id: 8, desiredDir: 'e'}),
-				new traffic.Car({id: 7, desiredDir: 'e'}),
-				new traffic.Car({id: 6, desiredDir: 'e'}), // first car to appear
+			[
+				new traffic.Car({id: 6, desiredDir: 'e'}),
+				new traffic.Car({id: 5, desiredDir: 'w'}),
+				new traffic.Car({id: 4, desiredDir: 'w'}),
+				new traffic.Car({id: 3, desiredDir: 'w'})
 			],
-			[//will be placed on path 21
-			],
-			[//will be placed on path 31
-				new traffic.Car({id: 13, desiredDir: 'w'}),
-				new traffic.Car({id: 12, desiredDir: 'w'}),
+			[
+				new traffic.Car({id: 13, desiredDir: 's'}),
+				new traffic.Car({id: 12, desiredDir: 'n'}),
 				new traffic.Car({id: 11, desiredDir: 'w'}),
-				new traffic.Car({id: 10, desiredDir: 'w'}), // first car to appear
+				new traffic.Car({id: 10, desiredDir: 'n'}),
+				new traffic.Car({id: 9, desiredDir: 's'}),
+				new traffic.Car({id: 8, desiredDir: 'n'}),
+				new traffic.Car({id: 7, desiredDir: 'w'})
+			],
+			[
+				new traffic.Car({id: 19, desiredDir: 'e'}),
+				new traffic.Car({id: 18, desiredDir: 'w'}),
+				new traffic.Car({id: 17, desiredDir: 'e'}),
+				new traffic.Car({id: 16, desiredDir: 'n'}),
+				new traffic.Car({id: 15, desiredDir: 'e'}),
+				new traffic.Car({id: 14, desiredDir: 'n'})
 			]
 		]
 
+		//let carPlacements = generateCarPlacements();
+
+		let repr = "let carPlacements = [\n";
+		for(let i=0;i<carPlacements.length;i++) {
+			repr += "\t[\n";
+
+			for(let j=0;j<carPlacements[i].length;j++) {
+				repr += "\t\tnew traffic.Car({id: "+carPlacements[i][j].id+", desiredDir: '"+carPlacements[i][j].desiredDir+"'})";
+				if(j!==carPlacements[i].length-1) {
+					repr += ",\n";
+				}
+			}
+			
+
+			repr += "\n\t]";
+			if(i!==carPlacements.length-1) {
+				repr += ",\n";
+			}
+		};
+		repr += "\n]";
+		console.log(repr);
+		
 		const preTimedPhases = [
-			[24,4],
-			[27,29,7,9],
+			[4,24],
+			[7,9,27,29],
 			[14,34],
 			[17,19,37,39]
 		];
@@ -146,7 +209,13 @@ function App() {
 
 				if(carsToPlace.length > 0) {
 					if(sourcePathObjects[i].canPlaceCar()) {
-						let placement = { prevPathCars: carsToPlace, offset: 0, initialPlacement: true };
+						let offset = 0;
+						if(sourcePathObjects[i].cars[0]) {//If placing a follow up car(aka, NOT the first car being placed).
+							//Place car exactly behind the one that is on the path already.
+							offset = sourcePathObjects[i].cars[0].pos - ((1/(sourcePathObjects[i].curvePath.length*2))*2);
+						}
+
+						let placement = { prevPathCars: carsToPlace, offset: offset, initialPlacement: true };
 						sourcePathObjects[i].placeCarAtStart(scene.current, carsToPlace[carsToPlace.length-1], placement);
 					}
 				}
@@ -156,7 +225,11 @@ function App() {
 			}
 		}
 
-		const carsLeftOnPaths = (paths) => {
+		const carsLeftOnPaths = (paths, filter = null) => {
+			if(filter) {
+				paths = paths.filter((path) => filter.includes(path.id) );
+			}
+
 			let numCars = 0;
 			paths.forEach((path) => {
 				numCars += path.cars.length;
@@ -168,34 +241,138 @@ function App() {
 			return false;
 		}
 
+		//Might not need this function later.
+		//Cleaning up variables set in last simulation(stale values).
+		const resetSharedSettings = () => {
+			timeTilNextPhase.current = null;
+			allowedPaths.current = [];
+		};
+
+		const resetPreTimedSettings = () => {
+			preTimedNumPhasesPassed.current = 0;
+		};
+
+		/*Replacer function*/
+		const removeCircularRefCausingPrevPath = (key, value) => {
+			if (key === "prevPath") {
+				return undefined;
+			}
+			return value;
+		};
+
+		/*
+		cost is the cost to empty the phase of stopped cars denominated in the others stopping for that long.
+		phaseId must be one of "4,24", "7,9,27,29", "14,34", or "17,19,37,39"
+		//timeLeftToFinishCurrentPhase could adjust weighting in favour for the phase currently running, since there is a cost to completing a phase.
+		*/
+		const calcCtescvp = (phaseId, pairs, singles, timeLeftToFinishCurrentPhase, stoppedEstimated) => {
+			let greenTimeNeeded = 0;
+			let myDeterministicPath = null;
+
+			let currentPhase = allowedPaths.current.join(",");
+
+			if(phaseId === "4,24") {
+				myDeterministicPath = "3,23";
+			} else if(phaseId === "7,9,27,29") {
+				myDeterministicPath = "6,26";
+			} else if(phaseId === "14,34") {
+				myDeterministicPath = "13,33";
+			} else if(phaseId === "17,19,37,39") {
+				myDeterministicPath = "16,36";
+			}
+
+			let numPairs = pairs[myDeterministicPath];
+			let numSingles = singles[myDeterministicPath];
+
+			let hasStoppedCarsInDeterministicZone = (numPairs || numSingles) ? 1 : 0;
+			let hasPairsAndSinglesInDeterministicZone = (numPairs && numSingles) ? 1 : 0;
+			greenTimeNeeded += (3800*hasStoppedCarsInDeterministicZone) /*+
+								  (Math.max(0, numSingles-1)*1000) +
+								  (Math.max(0, numPairs-1)*1000) +
+								  (hasPairsAndSinglesInDeterministicZone*1000)*/; // old version counts singles/pairs and their presence
+
+			if(phaseId === currentPhase) {
+				console.log("subtracting green time of"+timeLeftToFinishCurrentPhase);
+				greenTimeNeeded -= timeLeftToFinishCurrentPhase;
+				greenTimeNeeded = greenTimeNeeded < 0 ? 0 : greenTimeNeeded;
+			}
+
+			//old version: uses number of stopped cars seen within the deterministic zone.
+			/*let numPairsThatArentMine = 0;
+			let numSinglesThatArentMine = 0;
+			for(let dp in pairs) { // dp = deterministic path
+				if(dp !== myDeterministicPath) {
+					numPairsThatArentMine += pairs[dp];
+					numSinglesThatArentMine += singles[dp];
+				}
+			}
+			let numCarsStoppedThatArentMine = (numPairsThatArentMine*2)+numSinglesThatArentMine;*/ //deterministic only
+			
+			//new version: uses 33.33% and 66.66% weights for cars on a phase that are outside of the deterministic zone.
+			let numCarsStoppedThatArentMine = 0;
+			for(let dpe in stoppedEstimated) { // dpe = deterministic and estimated path
+				if(dpe !== myDeterministicPath) {
+					numCarsStoppedThatArentMine += stoppedEstimated[dpe]; //deterministic & estimated
+				}
+			}
+
+
+			let costToRun = 0;
+			if(pairs[myDeterministicPath] + singles[myDeterministicPath] > 0) {
+				costToRun = greenTimeNeeded*numCarsStoppedThatArentMine;
+			} else {
+				costToRun = Infinity;
+			}
+
+			return { costToRun, greenTimeNeeded};
+		};
+
 		const tick = (now) => {
 			requestIdRef.current = requestAnimationFrame(tick);
 
 			const delta = (now - prevTime.current);
-
 			prevTime.current = now;
-			if(isNaN(delta)) {
-				//This makes sure all simulations are identical regardless of start time lag
-				targetPhaseTime.current = now + firstPhaseLength;
-				//console.log("[0] now:"+now+"   target phase time:"+targetPhaseTime.current);
-				
+
+			if(isNaN(delta)) {//First run(also runs on hot reload)
+				if(simulationMode === "Pre-timed") {
+					resetPreTimedSettings();
+					targetPhaseTime.current = now + firstPhaseLength;
+					console.log("[0] now:"+now+"   target phase time:"+targetPhaseTime.current);
+				} else if(simulationMode === "Geolocation-enabled") {
+					targetPhaseTime.current = Infinity;
+				}
+
 				return; // skip very first delta to prevent jumping
 			}
 
-			if(simulationMode !== simulationModeLastTick.current) { //Simulation mode changed
-				simulationModeLastTick.current = simulationMode;
-				timeTilNextPhase.current = null;
-				preTimedNumPhasesPassed.current = 0;
-				targetPhaseTime.current = now + firstPhaseLength;
+			if(simulationMode !== simulationModeLastSeen.current) { //Simulation mode changed
+				console.log("sim mode changed");
+				simulationModeLastSeen.current = simulationMode;
+				
+				resetSharedSettings();
+				if(simulationMode === "Pre-timed") {
+					targetPhaseTime.current = now + firstPhaseLength;
+				} else if(simulationMode === "Geolocation-enabled") {
+					targetPhaseTime.current = Infinity; //Not yet sure of the target phase time.
+				}
+				console.log("[0] now:"+now+"   target phase time:"+targetPhaseTime.current);
+
+				if(simulationMode === "Pre-timed") {
+					resetPreTimedSettings();
+				} else if(simulationMode === "Fully-actuated") {
+					//TODO?
+				} else if(simulationMode === "Geolocation-enabled") {
+					//TODO?
+				}
+
 				return;
 			}
 
-			if(startTime.current === undefined) {
-				startTime.current = now;
-			}
+			//if(startTime.current === undefined) {//Just nice to know, not currently used anywhere.
+			//	startTime.current = now;
+			//}
 
 			if(simulationMode === "Pre-timed") {
-
 				if(phaseStartTime.current === null) {
 					phaseStartTime.current = now;
 				}
@@ -206,7 +383,6 @@ function App() {
 					preTimedNumPhasesPassed.current++;
 					//console.log("[2] phase: "+preTimedNumPhasesPassed.current%4+" (started "+overshot.current+"ms late)");
 					phaseStartTime.current = now;
-					//targetPhaseTime.current = (preTimedPhaseTime * (preTimedNumPhasesPassed.current + 1));
 					targetPhaseTime.current = targetPhaseTime.current + preTimedPhaseTime; //(preTimedPhaseTime * (preTimedNumPhasesPassed.current + 1));
 
 					//console.log("Phase changed to: "+preTimedNumPhasesPassed.current);
@@ -219,7 +395,124 @@ function App() {
 			} else if(simulationMode === "Fully-actuated") {
 				return;
 			} else if(simulationMode === "Geolocation-enabled") {
-				return;
+				if(carsLeftOnPaths(simState.current.paths, [1,2,3,6,11,12,13,16,21,22,23,26,31,32,33,36])) {
+
+					let numStoppedCarsInPathsDeterministic = {};
+					//past the deterministic range we have to weigh the stopped cars 33.33% and 66.67%
+					let numStoppedCarsInPathsEstimatedPastDeterministic = {}
+					pathsLeadingUpToInt.forEach((path) => {
+						path.cars.forEach((car) => {
+							if((car.pos === 0.9 && [6,16,26,36].includes(path.id)) || (car.pos === (26/30) && [3,13,23,33].includes(path.id))) {
+
+								//Sets calculation flag so we only run one phasing calculation for each time a car hits the decision location.
+								if(simState.current.prevFramePaths) {
+									let prevPath = simState.current.prevFramePaths.filter((prevPath) => prevPath.id === path.id)[0];
+									let prevPathCar = prevPath.cars.filter((prevPathCar) => prevPathCar.id === car.id)[0];
+									if(prevPathCar.pos !== car.pos) {
+										couldCalcGeolocationPhasing.current = true;
+									}
+								}
+
+								numStoppedCarsInPathsDeterministic[path.id] = 1;
+								numStoppedCarsInPathsEstimatedPastDeterministic[path.id] = 1;
+								let stopPosInPath = [6,16,26,36].includes(path.id) ? 0.9 : 26/30; //0.9 or (26/30)=0.866.
+								numStoppedCarsInPathsDeterministic[path.id] += path.getNumImmediateFollowersDetermistic(stopPosInPath);
+								numStoppedCarsInPathsEstimatedPastDeterministic[path.id] += path.getNumImmediateFollowersEsimatedPastDeterministic(stopPosInPath, path.id);
+							}
+						});
+					});
+					
+					//Allows for another calculation to be 2.8 seconds out from the phase ending,
+					//lets us calculate again to see whether the phase should be extended
+					//console.log("now:"+now+" discounted target phase time: "+(targetPhaseTime.current-2800));
+
+					let currentDiscount = Math.max(2800, 2800+Math.floor((timeTilNextPhase.current-2800)/1000)*1000);
+					//Old version, if you use this instead of the above, also update the greentime needed formula in calcCtescvp
+					//let currentDiscount = 2800;
+
+					if(now >= targetPhaseTime.current-currentDiscount && canDoEarlyCalc.current) {
+						console.log("Doing another calculation as there might be a possibility on continuing the current phase");
+						couldCalcGeolocationPhasing.current = true;
+						canDoEarlyCalc.current = false;
+					}
+					if(now >= targetPhaseTime.current && canDoRegularCalc.current) {
+						console.log("Doing another calculation as phase finished.");
+						couldCalcGeolocationPhasing.current = true;
+						canDoRegularCalc.current = false;
+					}
+
+					if(couldCalcGeolocationPhasing.current &&
+						(now >= targetPhaseTime.current-currentDiscount || targetPhaseTime.current === Infinity)
+					) {
+						console.log("numStoppedCarsInPathsEstimatedPastDeterministic:");
+						console.log(numStoppedCarsInPathsEstimatedPastDeterministic);
+						//console.log(numStoppedCarsInPathsDeterministic);
+						let timeLeftToFinishCurrentPhase = targetPhaseTime.current-now;
+						
+						let pairs = {};
+						let singles = {};
+
+						let stoppedEstimated = {};
+
+						let pathGroupings = [[3,23],[6,26],[13,33],[16,36]];
+						pathGroupings.forEach((pathGroup) => {
+							let firstPathStoppedCarsDeterministic = numStoppedCarsInPathsDeterministic[pathGroup[0]] ?? 0; 
+							let secondPathStoppedCarsDeterministic = numStoppedCarsInPathsDeterministic[pathGroup[1]] ?? 0;
+
+							let firstPathStoppedCarsEstimated = numStoppedCarsInPathsEstimatedPastDeterministic[pathGroup[0]] ?? 0;
+							let secondPathStoppedCarsEstimated = numStoppedCarsInPathsEstimatedPastDeterministic[pathGroup[1]] ?? 0;
+
+
+							pairs[pathGroup[0]+","+pathGroup[1]] = Math.min( //pairs["13,33"] = Math.min(4,5);
+								firstPathStoppedCarsDeterministic,
+								secondPathStoppedCarsDeterministic
+							);
+							singles[pathGroup[0]+","+pathGroup[1]] = Math.abs(//singles["13,33"] = Math.abs(4-5);
+								firstPathStoppedCarsDeterministic - secondPathStoppedCarsDeterministic
+							);
+							stoppedEstimated[pathGroup[0]+","+pathGroup[1]] = firstPathStoppedCarsEstimated+secondPathStoppedCarsEstimated;
+						});
+						
+						//cost to empty stopped cars via paths, also includes how long to run the phase for to exhaust it based on initial look.
+						//todo: may need to recalculate once green time finishes, this is because other stopped cars came into the picture that weren't decidable
+						//when we first looked at intersection.
+						let ctescvp = {
+							"4,24": calcCtescvp("4,24", pairs, singles, timeLeftToFinishCurrentPhase, stoppedEstimated),
+							"7,9,27,29": calcCtescvp("7,9,27,29", pairs, singles, timeLeftToFinishCurrentPhase, stoppedEstimated),
+							"14,34": calcCtescvp("14,34", pairs, singles, timeLeftToFinishCurrentPhase, stoppedEstimated),
+							"17,19,37,39": calcCtescvp("17,19,37,39", pairs, singles, timeLeftToFinishCurrentPhase, stoppedEstimated)
+						}
+
+						//find cheapest
+						//console.log(ctescvp);
+						let cheapestEmptyingGroupId = Object.keys(ctescvp).reduce((accum, curr) => {
+							if(ctescvp[accum].costToRun < ctescvp[curr].costToRun) {
+								return accum;
+							} else {
+								return curr;
+							}
+						});
+
+						console.log(`Should run ${cheapestEmptyingGroupId} for ${ctescvp[cheapestEmptyingGroupId].greenTimeNeeded}ms as it's cost is ${ctescvp[cheapestEmptyingGroupId].costToRun}(cheapest)` );
+
+						let targetPhaseTimeBase = targetPhaseTime.current === Infinity ? now : targetPhaseTime.current;	//might be an ugly now value that affects sim time being reproducible?
+						if(now >= targetPhaseTime.current || targetPhaseTime.current === Infinity) {
+							allowedPaths.current = cheapestEmptyingGroupId.split(',').map((str) => parseInt(str));
+							targetPhaseTime.current = targetPhaseTimeBase + ctescvp[cheapestEmptyingGroupId].greenTimeNeeded;
+							canDoEarlyCalc.current = true;
+							
+						} else {
+							if(cheapestEmptyingGroupId === allowedPaths.current.join(',')) {
+								targetPhaseTime.current = targetPhaseTimeBase + ctescvp[cheapestEmptyingGroupId].greenTimeNeeded;
+							}
+						}
+						canDoRegularCalc.current = true;
+
+						couldCalcGeolocationPhasing.current = false;
+					}
+					timeTilNextPhase.current = targetPhaseTime.current-now;
+					//console.log("timeTilNextPhase: "+timeTilNextPhase.current);
+				}
 			}
 
 			if(keepTryingToPlaceCars.current === true) {
@@ -227,8 +520,8 @@ function App() {
 			}
 
 			if(carsLeftOnPaths(simState.current.paths)) {
+				simState.current.prevFramePaths = JSON.parse(JSON.stringify(simState.current.paths, removeCircularRefCausingPrevPath)); //store paths from last frame (deep clone)
 				traffic.progressCars(simState.current, scene.current, delta, allowedPaths.current, timeTilNextPhase.current);
-				simState.current.prevFramePaths = JSON.parse(JSON.stringify(simState.current.paths)); //store paths from last frame (deep clone)
 			} else {
 				if(simState.current.printedSimResults === false) {
 					console.log("Finished simulating. Car stop times:");
