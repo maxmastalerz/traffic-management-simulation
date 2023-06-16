@@ -52,9 +52,9 @@ function Path(obj) {
 			if(car.pos >= lookbackPos && car.pos < pos) { /*first run would be : >= 0.65 && < 0.9, or >= 0.5333333336666667 && < 0.8666666666666667 */
 				let weightOfCar = 1;
 				if(this.id === 1 && Number((idOfStartPath+"")[(idOfStartPath+"").length-1]) === 3) {
-					weightOfCar = 0;
+					weightOfCar = 1/3;
 				} else if(this.id === 1 && Number((idOfStartPath+"")[(idOfStartPath+"").length-1]) === 6) {
-					weightOfCar = 1;
+					weightOfCar = 2/3;
 				}
 
 				numFollowers = this.getNumImmediateFollowersEsimatedPastDeterministic(lookbackPos, idOfStartPath) + weightOfCar;
@@ -76,9 +76,9 @@ function Path(obj) {
 				if(nearestNextCarToPath1 && nearestNextCarToPath1.path.id !== this.id) {//If blocked by a another path, some of my own cars might be blocked, let's weigh them as followers.
 					let weightOfCar = 0;
 					if(Number((idOfStartPath+"")[(idOfStartPath+"").length-1]) === 3) {
-						weightOfCar = 0;
+						weightOfCar = 1/3;
 					} else if(Number((idOfStartPath+"")[(idOfStartPath+"").length-1]) === 6) {
-						weightOfCar = 1;
+						weightOfCar = 2/3;
 					}
 
 					//todo possible improvement: technically not length, but immediate cars(works well as long as there are no gaps between cars when first placing).
@@ -104,9 +104,9 @@ function Path(obj) {
 					let lastCarInPrevPath = this.prevPath.cars[this.prevPath.cars.length-1];
 					let weightOfCar = 1;
 					if(this.prevPath.id === 1 && Number((idOfStartPath+"")[(idOfStartPath+"").length-1]) === 3) {
-						weightOfCar = 0;
+						weightOfCar = 1/3;
 					} else if(this.prevPath.id === 1 && Number((idOfStartPath+"")[(idOfStartPath+"").length-1]) === 6) {
-						weightOfCar = 1;
+						weightOfCar = 2/3;
 					}
 
 					if(lastCarInPrevPath && mathHelpers.epsGreaterThanEqual(lastCarInPrevPath.pos, prevPathLookbackPos) && lastCarInPrevPath.pos <= 1) {//only if we are sure there is a car there, can we add it, and search further.
