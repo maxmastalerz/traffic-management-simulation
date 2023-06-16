@@ -65,14 +65,10 @@ function App() {
 
 	const generateCarPlacements = () => {
 		let carPlacements = [
-			[//will be placed on path 1
-			],
-			[//will be placed on path 11
-			],
-			[//will be placed on path 21
-			],
-			[//will be placed on path 31
-			]
+			[],//will be placed on path 1
+			[],//will be placed on path 11
+			[],//will be placed on path 21
+			[]//will be placed on path 31
 		];
 		let numWCars = Math.floor(Math.random()*9)+1;
 		let numNCars = Math.floor(Math.random()*6)+1;
