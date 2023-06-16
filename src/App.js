@@ -122,35 +122,35 @@ function App() {
 			simState.current.paths.filter((obj) => obj.id===31)[0]
 		]
 
-		let carPlacements = [
-			[
-				new traffic.Car({id: 2, desiredDir: 'e'}),
-				new traffic.Car({id: 1, desiredDir: 'e'})
-			],
-			[
-				new traffic.Car({id: 6, desiredDir: 'e'}),
-				new traffic.Car({id: 5, desiredDir: 'w'}),
-				new traffic.Car({id: 4, desiredDir: 'w'}),
-				new traffic.Car({id: 3, desiredDir: 'w'})
-			],
-			[
-				new traffic.Car({id: 13, desiredDir: 's'}),
-				new traffic.Car({id: 12, desiredDir: 'n'}),
-				new traffic.Car({id: 11, desiredDir: 'w'}),
-				new traffic.Car({id: 10, desiredDir: 'n'}),
-				new traffic.Car({id: 9, desiredDir: 's'}),
-				new traffic.Car({id: 8, desiredDir: 'n'}),
-				new traffic.Car({id: 7, desiredDir: 'w'})
-			],
-			[
-				new traffic.Car({id: 19, desiredDir: 'e'}),
-				new traffic.Car({id: 18, desiredDir: 'w'}),
-				new traffic.Car({id: 17, desiredDir: 'e'}),
-				new traffic.Car({id: 16, desiredDir: 'n'}),
-				new traffic.Car({id: 15, desiredDir: 'e'}),
-				new traffic.Car({id: 14, desiredDir: 'n'})
-			]
-		]
+let carPlacements = [
+	[
+		new traffic.Car({id: 8, desiredDir: 'e'}),
+		new traffic.Delay({delay: 3000}),
+		new traffic.Car({id: 7, desiredDir: 'n'}),
+		new traffic.Car({id: 6, desiredDir: 'n'}),
+		new traffic.Car({id: 5, desiredDir: 'n'}),
+		new traffic.Car({id: 4, desiredDir: 'n'}),
+		new traffic.Car({id: 3, desiredDir: 'n'}),
+		new traffic.Car({id: 2, desiredDir: 'n'}),
+		new traffic.Car({id: 1, desiredDir: 'e'})
+	],
+	[
+		new traffic.Car({id: 17, desiredDir: 's'}),
+		new traffic.Car({id: 16, desiredDir: 's'}),
+		new traffic.Car({id: 15, desiredDir: 's'}),
+		new traffic.Car({id: 14, desiredDir: 's'}),
+		new traffic.Car({id: 13, desiredDir: 's'}),
+		new traffic.Car({id: 12, desiredDir: 's'}),
+		new traffic.Car({id: 11, desiredDir: 's'}),
+		new traffic.Car({id: 10, desiredDir: 's'}),
+		new traffic.Car({id: 9, desiredDir: 's'})
+	],
+	[
+	],
+	[
+	]
+]
+
 
 		//let carPlacements = generateCarPlacements();
 
@@ -199,24 +199,38 @@ function App() {
 		/*
 		Tries placing one of the cars from the simulation initilization onto one of the first cardinal paths.
 		*/
-		const tryPlacingNextInitialCar = () => {
+		const tryPlacingNextInitialCar = (delta) => {
 			for(let i=0;i<4;i++) {//for each of the cardinal directions
-				let carsToPlace = carPlacements[i];
+				let carsToPlaceOrDelay = carPlacements[i];
 
-				if(carsToPlace.length > 0) {
-					if(sourcePathObjects[i].canPlaceCar()) {
-						let offset = 0;
-						if(sourcePathObjects[i].cars[0]) {//If placing a follow up car(aka, NOT the first car being placed).
-							//Place car exactly behind the one that is on the path already.
-							offset = sourcePathObjects[i].cars[0].pos - ((1/(sourcePathObjects[i].curvePath.length*2))*2);
-						}
+				if(carsToPlaceOrDelay.length > 0) {
+					if(carsToPlaceOrDelay[carsToPlaceOrDelay.length-1] instanceof traffic.Delay) {
+						sourcePathObjects[i].mostRecentDelayRequested = sourcePathObjects[i].delayLeft = carsToPlaceOrDelay[carsToPlaceOrDelay.length-1].delay;
 
-						let placement = { prevPathCars: carsToPlace, offset: offset, initialPlacement: true };
-						sourcePathObjects[i].placeCarAtStart(scene.current, carsToPlace[carsToPlace.length-1], placement);
+						carsToPlaceOrDelay.pop();//remove delay from queue.
 					}
+
+					if(sourcePathObjects[i].canPlaceCar()) {
+						sourcePathObjects[i].delayLeft = (sourcePathObjects[i].delayLeft-delta > 0) ? sourcePathObjects[i].delayLeft-delta : 0;
+
+						if(sourcePathObjects[i].delayLeft === 0) {
+							let offset = 0;
+							if(sourcePathObjects[i].cars[0] && sourcePathObjects[i].mostRecentDelayRequested === 0) {//If placing a follow up car(aka, NOT the first car being placed).
+								//Place car exactly behind the one that is on the path already.
+								offset = sourcePathObjects[i].cars[0].pos - ((1/(sourcePathObjects[i].curvePath.length*2))*2);
+							}
+
+							let placement = { prevPathCars: carsToPlaceOrDelay, offset: offset, initialPlacement: true };
+							sourcePathObjects[i].placeCarAtStart(scene.current, carsToPlaceOrDelay[carsToPlaceOrDelay.length-1], placement);
+
+							sourcePathObjects[i].mostRecentDelayRequested = 0;
+						}
+					}
+
+					
 				}
 			}
-			if(carPlacements[0].length + carPlacements[1].length + carPlacements[2].length + carPlacements[3].length === 0) { // all cars placed
+			if(carPlacements[0].length + carPlacements[1].length + carPlacements[2].length + carPlacements[3].length === 0) { // all cars(or delays) placed
 				keepTryingToPlaceCars.current = false;
 			}
 		}
@@ -512,7 +526,7 @@ function App() {
 			}
 
 			if(keepTryingToPlaceCars.current === true) {
-				tryPlacingNextInitialCar();
+				tryPlacingNextInitialCar(delta);
 			}
 
 			if(carsLeftOnPaths(simState.current.paths)) {

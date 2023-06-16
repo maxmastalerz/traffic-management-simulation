@@ -12,6 +12,10 @@ const carMaterials = {
 	'w': new MeshBasicMaterial( { color: 0xffffff } )  // White
 }
 
+function Delay(obj) {
+	this.delay = obj.delay;
+}
+
 function Car(obj) {
 	this.id = obj.id;
 	this.desiredDir = obj.desiredDir;
@@ -32,6 +36,8 @@ function Path(obj) {
 	this.cars = [];
 	this.possiblePaths = obj.possiblePaths;
 	this.prevPath = obj.prevPath;
+	this.mostRecentDelayRequested = 0;
+	this.delayLeft = 0;
 
 	/*Does very similar logic as getNumImmediateFollowersDetermistic,
 	except it continues the search further past the deterministic paths where a cars desired direction is unknown,
@@ -60,7 +66,6 @@ function Path(obj) {
 				numFollowers = this.getNumImmediateFollowersEsimatedPastDeterministic(lookbackPos, idOfStartPath) + weightOfCar;
 				break;//found the car we were looking for, no need to search further
 			} else if(lookbackPos > 0 && i===0 && [2,3,6].includes(Number((this.id+"")[(this.id+"").length-1]))/* && car.pos <= pos*/){ // else is hit if there is a gap on my path(aka, path isn't filled up fully with cars)
-				//console.log("gap found");
 				//debugger;
 				let pathx1 = null;
 				if(Number((this.id+"")[(this.id+"").length-1]) === 3) {
@@ -76,13 +81,15 @@ function Path(obj) {
 				if(nearestNextCarToPath1 && nearestNextCarToPath1.path.id !== this.id) {//If blocked by a another path, some of my own cars might be blocked, let's weigh them as followers.
 					let weightOfCar = 0;
 					if(Number((idOfStartPath+"")[(idOfStartPath+"").length-1]) === 3) {
-						weightOfCar = 1/3;
+						weightOfCar = 1/3;//0 or 1/3
 					} else if(Number((idOfStartPath+"")[(idOfStartPath+"").length-1]) === 6) {
-						weightOfCar = 2/3;
+						weightOfCar = 2/3;//1 or 2/3
 					}
 
 					//todo possible improvement: technically not length, but immediate cars(works well as long as there are no gaps between cars when first placing).
-					numFollowers = weightOfCar*pathx1.cars.length;
+					//numFollowers = weightOfCar*pathx1.cars.length;
+					console.log("num immediate followers on path 1 is : "+pathx1.getNumImmediateFollowersDetermistic(1));
+					numFollowers = weightOfCar*pathx1.getNumImmediateFollowersDetermistic(1);
 					break;
 				}
 			}
@@ -104,9 +111,9 @@ function Path(obj) {
 					let lastCarInPrevPath = this.prevPath.cars[this.prevPath.cars.length-1];
 					let weightOfCar = 1;
 					if(this.prevPath.id === 1 && Number((idOfStartPath+"")[(idOfStartPath+"").length-1]) === 3) {
-						weightOfCar = 1/3;
+						weightOfCar = 1/3;// 0 or 1/3
 					} else if(this.prevPath.id === 1 && Number((idOfStartPath+"")[(idOfStartPath+"").length-1]) === 6) {
-						weightOfCar = 2/3;
+						weightOfCar = 2/3;// 1 or 2/3
 					}
 
 					if(lastCarInPrevPath && mathHelpers.epsGreaterThanEqual(lastCarInPrevPath.pos, prevPathLookbackPos) && lastCarInPrevPath.pos <= 1) {//only if we are sure there is a car there, can we add it, and search further.
@@ -297,7 +304,7 @@ function Path(obj) {
 					car.timeSpentStopped += delta;
 					//if(car.id===4 || car.id===5) {
 					//console.log("Car "+car.id+" hasn't moved since last frame. stoppedTime += "+delta+" = "+car.timeSpentStopped);
-					//}
+					//}git
 				}
 			}
 
@@ -338,5 +345,5 @@ function progressCars(simState, scene, delta, allowedPaths, timeTilNextPhase) {
 	})
 }
 
-let obj = { Car, Path, progressCars, carGeometry, carMaterials };
+let obj = { Car, Delay, Path, progressCars, carGeometry, carMaterials };
 export default obj;
