@@ -86,10 +86,8 @@ function Path(obj) {
 						weightOfCar = 2/3;//1 or 2/3
 					}
 
-					//todo possible improvement: technically not length, but immediate cars(works well as long as there are no gaps between cars when first placing).
-					//numFollowers = weightOfCar*pathx1.cars.length;
-					console.log("num immediate followers on path 1 is : "+pathx1.getNumImmediateFollowersDetermistic(1));
-					numFollowers = weightOfCar*pathx1.getNumImmediateFollowersDetermistic(1);
+					//Gets immediate cars on path 1 as there could be gaps. Also handles without gaps.
+					numFollowers = weightOfCar*pathx1.getNumImmediateFollowersDetermistic(1+Number.EPSILON); //+epsilon so we count all cars, including if there happens to be one at exactly pos=1.
 					break;
 				}
 			}
