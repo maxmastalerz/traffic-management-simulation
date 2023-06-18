@@ -147,7 +147,7 @@ function Path(obj) {
 
 			//If we haven't found it yet, it might be in a previous path:
 			if(lookbackPos < 0) {//keep in mind "x"3's previous path: 2.
-				if(Number((this.prevPath.id+"")[(this.prevPath.id+"").length-1]) === 2) {//The only previous path which is deterministic is the one with id=2
+				if(this.prevPath && Number((this.prevPath.id+"")[(this.prevPath.id+"").length-1]) === 2) {//The only previous path which is deterministic is the one with id=2
 					let prevPathLookbackPos = 1-((Math.abs(lookbackPos)*this.curvePath.length)*(1/this.prevPath.curvePath.length));
 					let lastCarInPrevPath = this.prevPath.cars[this.prevPath.cars.length-1];
 					if(lastCarInPrevPath && mathHelpers.epsGreaterThanEqual(lastCarInPrevPath.pos, prevPathLookbackPos) && lastCarInPrevPath.pos <= 1) {//only if we are sure there is a car there, can we add it, and search further.

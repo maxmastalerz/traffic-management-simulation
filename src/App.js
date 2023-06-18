@@ -24,6 +24,7 @@ function App() {
 	//var preTimedInterval = useRef(null);
 	let timeTilNextPhase = useRef(null);
 	var preTimedNumPhasesPassed = useRef(0);
+	var fullyActuatedNumPhasesPassed = useRef(0);
 	const preTimedPhaseTime = 5800; //Example: (0.8/0.002)+((2+4)/0.002) = 3400 for 4 cars at 0.002 speed.
 									//or (0.8/0.001)+((2+3)/0.001) = 5800 for 3 cars at 0.001 speed.
 	const firstPhaseLength = 8600;//8600 for cars coming from east/west. 6083 = (5+1.4952713686069787-0.4)*1000 for cars from north/south
@@ -114,6 +115,19 @@ function App() {
 		let bgItems = drawings.drawBg(scene.current, WorldSpaceWidth, WorldSpaceHeight);
 		simState.current.paths = drawings.drawPaths(scene.current, WorldSpaceWidth, WorldSpaceHeight);
 		let pathsLeadingUpToInt = simState.current.paths.filter((obj) => [3,6,13,16,23,26,33,36].includes(obj.id));
+		let pathGroupsLeadingUpToInt = [[],[],[],[]];//[3,23],[6,26],[13,33],[16,36]
+		for(let i=0; i<simState.current.paths.length; i++) {
+			let path = simState.current.paths[i];
+			if(path.id === 3 || path.id === 23) {
+				pathGroupsLeadingUpToInt[0].push(path);
+			} else if(path.id === 6 || path.id === 26) {
+				pathGroupsLeadingUpToInt[1].push(path);
+			} else if(path.id === 13 || path.id === 33) {
+				pathGroupsLeadingUpToInt[2].push(path);
+			} else if(path.id === 16 || path.id === 36) {
+				pathGroupsLeadingUpToInt[3].push(path);
+			}
+		}
 
 		const sourcePathObjects = [
 			simState.current.paths.filter((obj) => obj.id===1)[0],
@@ -124,34 +138,24 @@ function App() {
 
 let carPlacements = [
 	[
-		new traffic.Car({id: 8, desiredDir: 'e'}),
-		new traffic.Delay({delay: 3000}),
-		new traffic.Car({id: 7, desiredDir: 'n'}),
-		new traffic.Car({id: 6, desiredDir: 'n'}),
-		new traffic.Car({id: 5, desiredDir: 'n'}),
-		new traffic.Car({id: 4, desiredDir: 'n'}),
-		new traffic.Car({id: 3, desiredDir: 'n'}),
-		new traffic.Car({id: 2, desiredDir: 'n'}),
+		new traffic.Car({id: 6, desiredDir: 'e'}),
+		new traffic.Car({id: 5, desiredDir: 'e'}),
+		new traffic.Car({id: 4, desiredDir: 'e'}),
+		new traffic.Car({id: 3, desiredDir: 'e'}),
+		new traffic.Car({id: 2, desiredDir: 'e'}),
+		new traffic.Delay({delay: 2000}),
 		new traffic.Car({id: 1, desiredDir: 'e'})
 	],
 	[
-		new traffic.Car({id: 17, desiredDir: 's'}),
-		new traffic.Car({id: 16, desiredDir: 's'}),
-		new traffic.Car({id: 15, desiredDir: 's'}),
-		new traffic.Car({id: 14, desiredDir: 's'}),
-		new traffic.Car({id: 13, desiredDir: 's'}),
-		new traffic.Car({id: 12, desiredDir: 's'}),
-		new traffic.Car({id: 11, desiredDir: 's'}),
 		new traffic.Car({id: 10, desiredDir: 's'}),
-		new traffic.Car({id: 9, desiredDir: 's'})
+		new traffic.Car({id: 9, desiredDir: 's'}),
+		new traffic.Car({id: 8, desiredDir: 's'}),
+		new traffic.Car({id: 7, desiredDir: 's'}),
+		new traffic.Delay({delay: 5000})
 	],
-	[
-	],
-	[
-	]
+	[],
+	[]
 ]
-
-
 		//let carPlacements = generateCarPlacements();
 
 		let repr = "let carPlacements = [\n";
@@ -174,11 +178,11 @@ let carPlacements = [
 		repr += "\n]";
 		console.log(repr);
 		
-		const preTimedPhases = [
-			[4,24],
-			[7,9,27,29],
-			[14,34],
-			[17,19,37,39]
+		let phasesOrdered = [//always allowed in pre timed phasing but can be restricted from running by actuated phasing.
+			{pathsToAllow: [4,24], allowedByActuation: false },
+			{pathsToAllow: [7,9,27,29], allowedByActuation: false },
+			{pathsToAllow: [14,34], allowedByActuation: false },
+			{pathsToAllow: [17,19,37,39], allowedByActuation: false }
 		];
 
 		resetSimSettings();
@@ -262,6 +266,10 @@ let carPlacements = [
 			preTimedNumPhasesPassed.current = 0;
 		};
 
+		const resetFullyActuatedSettings = () => {
+			fullyActuatedNumPhasesPassed.current = 0;
+		};
+
 		/*Replacer function*/
 		const removeCircularRefCausingPrevPath = (key, value) => {
 			if (key === "prevPath") {
@@ -337,6 +345,21 @@ let carPlacements = [
 			return { costToRun, greenTimeNeeded};
 		};
 
+		const arraysEqual = (a, b) => {
+			if (a === b) return true;
+			if (a == null || b == null) return false;
+			if (a.length !== b.length) return false;
+
+			//don't care about order of elements
+			a.sort();
+			b.sort();
+
+			for (var i = 0; i < a.length; ++i) {
+			if (a[i] !== b[i]) return false;
+			}
+			return true;
+		};
+
 		const tick = (now) => {
 			requestIdRef.current = requestAnimationFrame(tick);
 
@@ -348,6 +371,9 @@ let carPlacements = [
 					resetPreTimedSettings();
 					targetPhaseTime.current = now + firstPhaseLength;
 					console.log("[0] now:"+now+"   target phase time:"+targetPhaseTime.current);
+				} else if(simulationMode === "Fully-actuated") {
+					resetFullyActuatedSettings();
+					targetPhaseTime.current = Infinity;
 				} else if(simulationMode === "Geolocation-enabled") {
 					targetPhaseTime.current = Infinity;
 				}
@@ -362,18 +388,14 @@ let carPlacements = [
 				resetSharedSettings();
 				if(simulationMode === "Pre-timed") {
 					targetPhaseTime.current = now + firstPhaseLength;
+					resetPreTimedSettings();
+				} else if(simulationMode === "Fully-actuated") {
+					resetFullyActuatedSettings();
+					targetPhaseTime.current = Infinity;
 				} else if(simulationMode === "Geolocation-enabled") {
 					targetPhaseTime.current = Infinity; //Not yet sure of the target phase time.
 				}
 				console.log("[0] now:"+now+"   target phase time:"+targetPhaseTime.current);
-
-				if(simulationMode === "Pre-timed") {
-					resetPreTimedSettings();
-				} else if(simulationMode === "Fully-actuated") {
-					//TODO?
-				} else if(simulationMode === "Geolocation-enabled") {
-					//TODO?
-				}
 
 				return;
 			}
@@ -398,12 +420,84 @@ let carPlacements = [
 					//console.log("Phase changed to: "+preTimedNumPhasesPassed.current);
 				}
 
-				allowedPaths.current = preTimedPhases[(preTimedNumPhasesPassed.current)%4];
+				allowedPaths.current = phasesOrdered[(preTimedNumPhasesPassed.current)%4].pathsToAllow;
 
 				timeTilNextPhase.current = targetPhaseTime.current-now+(overshot.current);
 
 			} else if(simulationMode === "Fully-actuated") {
-				return;
+				if(phaseStartTime.current === null) {
+					phaseStartTime.current = now;
+				}
+
+				pathGroupsLeadingUpToInt.forEach((pathGroup) => {
+					let path1Actuated = false;
+					let path2Actuated = false;
+					let oneUnitLength = 1/(pathGroup[0].curvePath.length);//[0] and [1] both have the same lengths since they're mirrors or each other
+
+					//Path 1 actuation check.
+					for(let i=0; i < pathGroup[0].cars.length; i++) {
+						let car = pathGroup[0].cars[i];
+
+						if(car.pos > (1-(oneUnitLength*2)-(oneUnitLength*(4/10)))) {
+							path1Actuated = true;
+							break;
+						}
+					};
+
+					//Path 2 actuation check.
+					for(let i=0; i < pathGroup[1].cars.length; i++) {
+						let car = pathGroup[1].cars[i];
+
+						if(car.pos > (1-(oneUnitLength*2)-(oneUnitLength*(4/10)))) {
+							path2Actuated = true;
+							break;
+						}
+					};
+
+					phasesOrdered = phasesOrdered.map((phase) => {
+						if(phase.pathsToAllow.includes(pathGroup[0].id+1)) {
+							
+							if(!(path1Actuated || path2Actuated)) {//If neither paths are actuated,
+								//if current phase that is running right now unactuated
+								if(allowedPaths.current.includes(pathGroup[0].id+1) && targetPhaseTime.current === Infinity) {
+									targetPhaseTime.current = now + 3400; //todo fix: make 3800 dynamic depending on speed and maximum path length for phase.
+									console.log(`Unactuated: Target phase time = ${targetPhaseTime.current}`);
+								}
+							} else {
+								if(allowedPaths.current.includes(pathGroup[0].id+1)) {
+									targetPhaseTime.current = Infinity;
+									timeTilNextPhase.current = Infinity;
+								}
+							}
+
+							if(now < targetPhaseTime.current) {
+								//Override actuation as active given that the cars haven't cleared the intersection yet.
+								return { pathsToAllow: phase.pathsToAllow, allowedByActuation: true };
+							} else {
+								return { pathsToAllow: phase.pathsToAllow, allowedByActuation: (path1Actuated || path2Actuated) };
+							}
+						}
+						return phase;
+					});
+				});
+
+				let numPotentialPhasesSearched = 0;
+				while(phasesOrdered[fullyActuatedNumPhasesPassed.current%4].allowedByActuation === false && numPotentialPhasesSearched<4) {
+					fullyActuatedNumPhasesPassed.current++;
+					numPotentialPhasesSearched++;
+				}
+				if(numPotentialPhasesSearched === 4) {
+					if(allowedPaths.current.length > 0) { //Makes sure we only print message once
+						console.log("Not allowing any more phases until another actuation occurs.");
+						allowedPaths.current = [];
+					}
+				} else if(now >= targetPhaseTime.current || targetPhaseTime.current === Infinity) {
+					if(!arraysEqual(allowedPaths.current, phasesOrdered[fullyActuatedNumPhasesPassed.current%4].pathsToAllow)) {
+						console.log("Allowing phase: "+JSON.stringify(phasesOrdered[fullyActuatedNumPhasesPassed.current%4].pathsToAllow));
+					}
+					allowedPaths.current = phasesOrdered[fullyActuatedNumPhasesPassed.current%4].pathsToAllow;
+				}
+				
 			} else if(simulationMode === "Geolocation-enabled") {
 				if(carsLeftOnPaths(simState.current.paths, [1,2,3,6,11,12,13,16,21,22,23,26,31,32,33,36])) {
 
