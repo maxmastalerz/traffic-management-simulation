@@ -8,9 +8,13 @@ const bgAndPathMaterials = [
 	new MeshBasicMaterial( {color: 0xA8FF93, side: DoubleSide} ), //light green box
 	new MeshBasicMaterial( {color: 0x8AFC6E, side: DoubleSide} ), //darker green box
 	new MeshBasicMaterial( {color: 0x807E78, side: DoubleSide} ), //asphalt grey road
-	new LineBasicMaterial( { color: 0xff0000 } ), // Red line
-	new LineBasicMaterial( { color: 0x00ff00 } ), // Green line
-	new LineBasicMaterial( { color: 0x0000ff } ), // Blue line
+	new LineBasicMaterial( { color: 0xffffff } ), // White line
+	new LineBasicMaterial( { color: 0x000000 } ), // Black line
+	new LineBasicMaterial( { transparent: true, opacity: 0 } ), // Transparent Line (For cars to follow)
+	new LineBasicMaterial( { color: 0xff0000 } ), //4 ,24       phase
+	new LineBasicMaterial( { color: 0xff0000 } ), //7 ,9 ,27,29 phase
+	new LineBasicMaterial( { color: 0xff0000 } ), //14,34       phase
+	new LineBasicMaterial( { color: 0xff0000 } )  //17,19,37,39 phase
 ];
 
 const squareGeometry = new PlaneGeometry( 1, 1 );
@@ -143,7 +147,7 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 			possiblePaths: {}
 		}));
 
-		//4
+		//4 - in intersection
 		let ptAfor4 = new Vector3( 9 -(WorldSpaceWidth/2), -7.5 +(WorldSpaceHeight/2), 1 );
 		let ptBfor4 = new Vector3( 9.5 -(WorldSpaceWidth/2), -7.5 +(WorldSpaceHeight/2), 1 );
 		let ptCfor4 = new Vector3( 11.5 -(WorldSpaceWidth/2), -6.5 +(WorldSpaceHeight/2), 1 );
@@ -158,7 +162,8 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		path4Points.add(path4LineCurve);
 		let points4 = path4Points.curves.reduce((p, d)=> [...p, ...d.getSpacedPoints(20)], []);
 		const geometry4 = new BufferGeometry().setFromPoints( points4 );
-		const path4 = new Line( geometry4, bgAndPathMaterials[3] );
+		let materialPhaseId = (i%2==0) ? 6 : 8;
+		const path4 = new Line( geometry4, bgAndPathMaterials[materialPhaseId] );
 		paths.push(new traffic.Path({
 			id: 4+(10*i),
 			geometry: geometry4,
@@ -180,7 +185,7 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		path3Points.add(path3LineCurve);
 		let points3 = path3Points.curves.reduce((p, d)=> [...p, ...d.getPoints(20)], []);
 		const geometry3 = new BufferGeometry().setFromPoints( points3 );
-		const path3 = new Line( geometry3, bgAndPathMaterials[5] );
+		const path3 = new Line( geometry3, bgAndPathMaterials[3] );
 		paths.push(new traffic.Path({
 			id: 3+(10*i),
 			geometry: geometry3,
@@ -228,7 +233,7 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		path8Points.add(path8LineCurve);
 		let points8 = path8Points.curves.reduce((p, d)=> [...p, ...d.getPoints(20)], []);
 		const geometry8 = new BufferGeometry().setFromPoints( points8 );
-		const path8 = new Line( geometry8, bgAndPathMaterials[3] );
+		const path8 = new Line( geometry8, bgAndPathMaterials[5] );
 		paths.push(new traffic.Path({
 			id: 8+(10*i),
 			geometry: geometry8,
@@ -237,7 +242,7 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 			possiblePaths: {}
 		}));
 
-		//7
+		//7 - in intersection
 		let ptAfor7 = new Vector3( 9 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 );
 		let ptBfor7 = new Vector3( 12 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 );
 		ptAfor7.applyAxisAngle( rotationAxis, rotationOnZAxis );
@@ -248,7 +253,8 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		path7Points.add(path7LineCurve);
 		let points7 = path7Points.curves.reduce((p, d)=> [...p, ...d.getPoints(20)], []);
 		const geometry7 = new BufferGeometry().setFromPoints( points7 );
-		const path7 = new Line( geometry7, bgAndPathMaterials[4] );
+		materialPhaseId = (i%2==0) ? 7 : 9;
+		const path7 = new Line( geometry7, bgAndPathMaterials[materialPhaseId] );
 		paths.push(new traffic.Path({
 			id: 7+(10*i),
 			geometry: geometry7,
@@ -280,7 +286,7 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 			}
 		}));
 
-		//9
+		//9 - in intersection
 		let ptAfor9 = new Vector3( 9 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 );
 		let ptBfor9 = new Vector3( 9.5 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 );
 		let ptCfor9 = new Vector3( 9.5 -(WorldSpaceWidth/2), -8.5 +(WorldSpaceHeight/2), 1 );
@@ -295,7 +301,8 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		path9Points.add(path9LineCurve);
 		let points9 = path9Points.curves.reduce((p, d)=> [...p, ...d.getSpacedPoints(20)], []);
 		const geometry9 = new BufferGeometry().setFromPoints( points9 );
-		const path9 = new Line( geometry9, bgAndPathMaterials[3] );
+		materialPhaseId = (i%2==0) ? 7 : 9;
+		const path9 = new Line( geometry9, bgAndPathMaterials[materialPhaseId] );
 		paths.push(new traffic.Path({
 			id: 9+(10*i),
 			geometry: geometry9,
@@ -317,7 +324,7 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		path6Points.add(path6LineCurve);
 		let points6 = path6Points.curves.reduce((p, d)=> [...p, ...d.getPoints(20)], []);
 		const geometry6 = new BufferGeometry().setFromPoints( points6 );
-		const path6 = new Line( geometry6, bgAndPathMaterials[5] );
+		const path6 = new Line( geometry6, bgAndPathMaterials[3] );
 		paths.push(new traffic.Path({
 			id: 6+(10*i),
 			geometry: geometry6,

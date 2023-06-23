@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Scene, OrthographicCamera, WebGLRenderer /*, BoxGeometry, MeshBasicMaterial, Mesh*/ } from 'three';
+import { Scene, OrthographicCamera, WebGLRenderer, Color /*, BoxGeometry, MeshBasicMaterial, Mesh*/ } from 'three';
 
 import './App.css';
 import { Container, DropdownButton, Dropdown, Row, Col } from 'react-bootstrap';
@@ -116,16 +116,31 @@ function App() {
 		simState.current.paths = drawings.drawPaths(scene.current, WorldSpaceWidth, WorldSpaceHeight);
 		let pathsLeadingUpToInt = simState.current.paths.filter((obj) => [3,6,13,16,23,26,33,36].includes(obj.id));
 		let pathGroupsLeadingUpToInt = [[],[],[],[]];//[3,23],[6,26],[13,33],[16,36]
+		let pathGroupsInInt = {"4,24":[],"7,9,27,29":[],"14,34":[],"17,19,37,39":[]};//[4,24],[7,9,27,29],[14,34],[17,19,37,39]
 		for(let i=0; i<simState.current.paths.length; i++) {
 			let path = simState.current.paths[i];
 			if(path.id === 3 || path.id === 23) {
 				pathGroupsLeadingUpToInt[0].push(path);
+				continue;
 			} else if(path.id === 6 || path.id === 26) {
 				pathGroupsLeadingUpToInt[1].push(path);
+				continue;
 			} else if(path.id === 13 || path.id === 33) {
 				pathGroupsLeadingUpToInt[2].push(path);
+				continue;
 			} else if(path.id === 16 || path.id === 36) {
 				pathGroupsLeadingUpToInt[3].push(path);
+				continue;
+			}
+
+			if(path.id === 4 || path.id === 24) {
+				pathGroupsInInt['4,24'].push(path);
+			} else if(path.id === 7 || path.id === 9 || path.id === 27 || path.id === 29) {
+				pathGroupsInInt['7,9,27,29'].push(path);
+			} else if(path.id === 14 || path.id === 34) {
+				pathGroupsInInt['14,34'].push(path);
+			} else if(path.id === 17 || path.id === 19 || path.id === 37 || path.id === 39) {
+				pathGroupsInInt['17,19,37,39'].push(path);
 			}
 		}
 
@@ -138,6 +153,8 @@ function App() {
 
 let carPlacements = [
 	[
+		new traffic.Car({id: 7, desiredDir: 'e'}),
+		new traffic.Delay({delay: 5000}),
 		new traffic.Car({id: 6, desiredDir: 'e'}),
 		new traffic.Car({id: 5, desiredDir: 'e'}),
 		new traffic.Car({id: 4, desiredDir: 'e'}),
@@ -147,10 +164,10 @@ let carPlacements = [
 		new traffic.Car({id: 1, desiredDir: 'e'})
 	],
 	[
+		new traffic.Car({id: 11, desiredDir: 's'}),
 		new traffic.Car({id: 10, desiredDir: 's'}),
 		new traffic.Car({id: 9, desiredDir: 's'}),
 		new traffic.Car({id: 8, desiredDir: 's'}),
-		new traffic.Car({id: 7, desiredDir: 's'}),
 		new traffic.Delay({delay: 5000})
 	],
 	[],
@@ -259,6 +276,7 @@ let carPlacements = [
 		//Cleaning up variables set in last simulation(stale values).
 		const resetSharedSettings = () => {
 			timeTilNextPhase.current = null;
+			pathGroupsInInt[allowedPaths.current.join(",")][0].path.material.color = new Color(0xff0000);
 			allowedPaths.current = [];
 		};
 
@@ -391,7 +409,7 @@ let carPlacements = [
 					resetPreTimedSettings();
 				} else if(simulationMode === "Fully-actuated") {
 					resetFullyActuatedSettings();
-					targetPhaseTime.current = Infinity;
+					targetPhaseTime.current = false;
 				} else if(simulationMode === "Geolocation-enabled") {
 					targetPhaseTime.current = Infinity; //Not yet sure of the target phase time.
 				}
@@ -410,8 +428,13 @@ let carPlacements = [
 				}
 
 				//console.log("[1] now:"+now+"   target phase time:"+targetPhaseTime.current);
+
 				if(now >= targetPhaseTime.current) {
 					overshot.current = (now - targetPhaseTime.current);
+
+					//set phase lines to red before going to next phase
+					pathGroupsInInt[phasesOrdered[(preTimedNumPhasesPassed.current)%4].pathsToAllow.join(",")][0].path.material.color = new Color(0xff0000);
+					
 					preTimedNumPhasesPassed.current++;
 					//console.log("[2] phase: "+preTimedNumPhasesPassed.current%4+" (started "+overshot.current+"ms late)");
 					phaseStartTime.current = now;
@@ -421,6 +444,13 @@ let carPlacements = [
 				}
 
 				allowedPaths.current = phasesOrdered[(preTimedNumPhasesPassed.current)%4].pathsToAllow;
+				
+				//set phase lines to yellow or green.
+				if(now >= targetPhaseTime.current-((0.8/0.001)+(3/0.001))) {//now >= targetPhaseTime-3800 means space for one more car in this phase, aka yellow
+					pathGroupsInInt[allowedPaths.current.join(",")][0].path.material.color = new Color(0xffff00);
+				} else {//green
+					pathGroupsInInt[allowedPaths.current.join(",")][0].path.material.color = new Color(0x00ff00);
+				}
 
 				timeTilNextPhase.current = targetPhaseTime.current-now+(overshot.current);
 
@@ -460,29 +490,59 @@ let carPlacements = [
 							if(!(path1Actuated || path2Actuated)) {//If neither paths are actuated,
 								//if current phase that is running right now unactuated
 								if(allowedPaths.current.includes(pathGroup[0].id+1) && targetPhaseTime.current === Infinity) {
-									targetPhaseTime.current = now + 3400; //todo fix: make 3800 dynamic depending on speed and maximum path length for phase.
+									targetPhaseTime.current = now + 3400 + 1000; //todo fix: make 3400 and 1000 dynamic depending on speed and maximum path length for phase.
 									console.log(`Unactuated: Target phase time = ${targetPhaseTime.current}`);
+								}
+								if(allowedPaths.current.length && targetPhaseTime.current) {
+									if(now >= targetPhaseTime.current-(1/0.001) && now < targetPhaseTime.current) {//1 sec out from end of phase, make it yellow
+										pathGroupsInInt[allowedPaths.current.join(",")][0].path.material.color = new Color(0xFFFF00);//yellow, no other actuations will extend the phase.
+									} else if(now < targetPhaseTime.current-(1/0.001)) {
+										pathGroupsInInt[allowedPaths.current.join(",")][0].path.material.color = new Color(0xC2FFC2);//very light green that indicates possibility of phase extension
+									}
 								}
 							} else {
 								if(allowedPaths.current.includes(pathGroup[0].id+1)) {
-									targetPhaseTime.current = Infinity;
-									timeTilNextPhase.current = Infinity;
+									//Allow path groups to run, except for the current path on a yellow light. Yellow means no more actuations.
+									if(!(now > targetPhaseTime.current-(1/0.001) && now <= targetPhaseTime.current+delta && phase.pathsToAllow.sort((a,b) => a-b).join(",")===allowedPaths.current.sort((a,b) => a-b).join(","))) {
+										targetPhaseTime.current = Infinity;
+										timeTilNextPhase.current = Infinity;
+									}
 								}
 							}
 
-							if(now < targetPhaseTime.current) {
-								//Override actuation as active given that the cars haven't cleared the intersection yet.
-								return { pathsToAllow: phase.pathsToAllow, allowedByActuation: true };
-							} else {
+							if(now > targetPhaseTime.current-(1/0.001) &&
+								now < targetPhaseTime.current &&
+								phase.pathsToAllow.sort((a,b) => a-b).join(",")===allowedPaths.current.sort((a,b) => a-b).join(",")) {//yellow, and someone on my phase triggers actuation
+								return { pathsToAllow: phase.pathsToAllow, allowedByActuation: false };
+							} else if(now > targetPhaseTime.current-(1/0.001) &&
+								now < targetPhaseTime.current &&
+								phase.pathsToAllow.sort((a,b) => a-b).join(",")!==allowedPaths.current.sort((a,b) => a-b).join(",")) {//yellow, and someone else triggers actuation
 								return { pathsToAllow: phase.pathsToAllow, allowedByActuation: (path1Actuated || path2Actuated) };
+							} else if(now < targetPhaseTime.current-(1/0.001) && phase.pathsToAllow.sort((a,b) => a-b).join(",")===allowedPaths.current.sort((a,b) => a-b).join(",")) {//extendable part of the phase, and someone on current phase triggers actuation
+								return { pathsToAllow: phase.pathsToAllow, allowedByActuation: true };
+							} else if(now < targetPhaseTime.current) {//for cars on other path groups that are in the actuation zone during the current phase, don't actuate.
+								return { pathsToAllow: phase.pathsToAllow, allowedByActuation: false };
+							} else if(now >= targetPhaseTime.current || targetPhaseTime.current===false) {//room for processing the next phase, just not the one that just ran(in case a car is actuating it right now)
+								if(phase.pathsToAllow.sort((a,b) => a-b).join(",")===allowedPaths.current.sort((a,b) => a-b).join(",")) {
+									return { pathsToAllow: phase.pathsToAllow, allowedByActuation: false };
+								} else {
+									return { pathsToAllow: phase.pathsToAllow, allowedByActuation: (path1Actuated || path2Actuated) };
+								}
 							}
 						}
+
 						return phase;
 					});
 				});
 
 				let numPotentialPhasesSearched = 0;
+
 				while(phasesOrdered[fullyActuatedNumPhasesPassed.current%4].allowedByActuation === false && numPotentialPhasesSearched<4) {
+					if(now >= targetPhaseTime.current) {
+						pathGroupsInInt[
+							phasesOrdered[(fullyActuatedNumPhasesPassed.current)%4].pathsToAllow.sort((a,b) => a-b).join(",")
+						][0].path.material.color = new Color(0xff0000); //set red light
+					}
 					fullyActuatedNumPhasesPassed.current++;
 					numPotentialPhasesSearched++;
 				}
@@ -495,7 +555,13 @@ let carPlacements = [
 					if(!arraysEqual(allowedPaths.current, phasesOrdered[fullyActuatedNumPhasesPassed.current%4].pathsToAllow)) {
 						console.log("Allowing phase: "+JSON.stringify(phasesOrdered[fullyActuatedNumPhasesPassed.current%4].pathsToAllow));
 					}
+
+					if(allowedPaths.current.length) {
+						pathGroupsInInt[allowedPaths.current.sort((a,b) => a-b).join(",")][0].path.material.color = new Color(0xff0000);//set red light
+					}
 					allowedPaths.current = phasesOrdered[fullyActuatedNumPhasesPassed.current%4].pathsToAllow;
+					pathGroupsInInt[allowedPaths.current.sort((a,b) => a-b).join(",")][0].path.material.color = new Color(0x00ff00);//green light
+					
 				}
 				
 			} else if(simulationMode === "Geolocation-enabled") {
