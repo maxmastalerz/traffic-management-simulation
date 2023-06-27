@@ -34,17 +34,16 @@ function App() {
 	let canDoRegularCalc = useRef(false);
 	let yellowTargetTime = useRef(false);//for geolocation algorithm
 	var overshot = useRef(0);
-	//let phaseNum = 0;
 
-	//Go thru paths, get every car on these paths, remove their mesh memory(car circle) from the scene.
-	//Also clear the cars from the path(unless circleMemoryOnly is set)
-	const clearOldCarsFromPaths = (circleMemoryOnly = false) => {
+	//Go thru paths, get every car on these paths, remove their mesh memory(car rect) from the scene.
+	//Also clear the cars from the path(unless rectMemoryOnly is set)
+	const clearOldCarsFromPaths = (rectMemoryOnly = false) => {
 		if(simState.current.paths) {
 			simState.current.paths.forEach((path) => {
 				path.cars.forEach((car) => {
-					scene.current.remove(car.circle);
+					scene.current.remove(car.rect);
 				});
-				if(!circleMemoryOnly) {
+				if(!rectMemoryOnly) {
 					path.cars = [];
 				}
 			});
@@ -182,7 +181,7 @@ function App() {
 				new traffic.Car({id: 16, desiredDir: 'n'})
 			]
 		]
-		
+
 		//let carPlacements = generateCarPlacements();
 
 		let repr = "let carPlacements = [\n";

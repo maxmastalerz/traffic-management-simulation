@@ -1,16 +1,17 @@
 import {
-	MeshBasicMaterial, Mesh, CircleGeometry
+	MeshBasicMaterial, Mesh, PlaneGeometry, Vector3
 } from 'three';
 
 import mathHelpers from "./mathHelpers";
 
-const carGeometry = new CircleGeometry( 0.4, 32 );
+const carGeometry = new PlaneGeometry(0.5, 0.8);
 const carMaterials = {
 	'n': new MeshBasicMaterial( { color: 0x000080 } ), // Navy blue
 	'e': new MeshBasicMaterial( { color: 0x50C878 } ), // Emerald Green
 	's': new MeshBasicMaterial( { color: 0xC0C0C0 } ), // Silver
 	'w': new MeshBasicMaterial( { color: 0xffffff } )  // White
 }
+const up = new Vector3( 0, 1, 0 );//upwards vector.
 
 function Delay(obj) {
 	this.delay = obj.delay;
@@ -21,7 +22,7 @@ function Car(obj) {
 	this.desiredDir = obj.desiredDir;
 	this.pos = obj.pos;
 	this.timeSpentStopped = 0;
-	this.circle = new Mesh( carGeometry, carMaterials[this.desiredDir] );
+	this.rect = new Mesh( carGeometry, carMaterials[this.desiredDir] );
 }
 
 function Path(obj) {
@@ -198,7 +199,7 @@ function Path(obj) {
 	this.removeCar = function(scene, carId) {
 		let car = this.cars.filter(car => car.id === carId)[0];
 		if(car) {
-			scene.remove(car.circle); // remove car circle from scene
+			scene.remove(car.rect); // remove car rectangle from scene
 		}
 
 		this.cars = this.cars.filter(car => car.id !== carId); // remove car from path.
@@ -262,15 +263,6 @@ function Path(obj) {
 				car.pos = lastPossibleSpot; //Note: If lastPossibleSpot is 1, it will just be overwritten below as the car will go onto the next path
 			}
 
-			/*if(this.id==6 && car.id==14 && car.pos>=0.895 && car.pos <=0.905) {
-				console.log("[3] 14 car pos:"+car.pos);
-			}
-			if(this.id==6 && car.id==15 && car.pos>=0.645 && car.pos <=0.655) {
-				console.log("[3] 15 car pos:"+car.pos);
-			}
-			if(this.id==6 && car.id==16 && car.pos>=0.395 && car.pos <=0.405) {
-				console.log("[3] 16 car pos:"+car.pos);
-			}*/
 			if(i===this.cars.length-1 && car.pos === lastPosInCurve) { // If is first car and has reached end of curve, move to next path
 				if(car.desiredDir in this.possiblePaths) { //if the next path exists
 					let nextPath = this.possiblePaths[car.desiredDir];
@@ -290,8 +282,14 @@ function Path(obj) {
 			}
 
 			const newPosition = this.curvePath.obj.getPoint(car.pos);
-			car.circle.position.set(newPosition.x, newPosition.y, 2);
-			//const tangent = this.curvePath.obj.getTangent(fraction); //Not implemented.
+			car.rect.position.set(newPosition.x, newPosition.y, 2);
+
+			//Have car rotation follow path angles.
+			var axis = new Vector3( );
+			const tangent = this.curvePath.obj.getTangent(car.pos);
+			axis.crossVectors( up, tangent ).normalize();
+    		let radians = Math.acos( up.dot( tangent ) );
+			car.rect.quaternion.setFromAxisAngle( axis, radians );
 
 			if(prevFramePaths) {//check in case prev frame paths is null like it would be on the very first frame.
 				let prevFramePath = prevFramePaths.filter((prevFramePath) => prevFramePath.id === this.id)[0];
@@ -300,9 +298,6 @@ function Path(obj) {
 				let prevFramePathCar = prevFramePath.cars.filter((prevFramePathCar) => prevFramePathCar.id === car.id)[0];
 				if(prevFramePathCar && car.pos === prevFramePathCar.pos) { //If the car was on this path last frame and if car hasn't moved since then,
 					car.timeSpentStopped += delta;
-					//if(car.id===4 || car.id===5) {
-					//console.log("Car "+car.id+" hasn't moved since last frame. stoppedTime += "+delta+" = "+car.timeSpentStopped);
-					//}git
 				}
 			}
 
@@ -313,7 +308,7 @@ function Path(obj) {
 	}
 	this.placeCarAtStart = function(scene, car, placement) {
 		if(placement.initialPlacement) {
-			scene.add(car.circle);
+			scene.add(car.rect);
 		}
 
 		car.pos = placement.offset;
@@ -324,7 +319,7 @@ function Path(obj) {
 			console.log("Due to excessive simulation delay/lag (caused by tab being inactive), the simulation is no longer accurate. Please reset");
 		}
 		
-		car.circle.position.set(this.curvePath.obj.getPoint(car.pos).x, this.curvePath.obj.getPoint(car.pos).y, 2);
+		car.rect.position.set(this.curvePath.obj.getPoint(car.pos).x, this.curvePath.obj.getPoint(car.pos).y, 2);
 		this.cars.unshift(car); // Add car
 	}
 	this.canPlaceCar = function() {
