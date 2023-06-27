@@ -32,6 +32,7 @@ function App() {
 	let couldCalcGeolocationPhasing = useRef(false);
 	let canDoEarlyCalc = useRef(true);
 	let canDoRegularCalc = useRef(false);
+	let yellowTargetTime = useRef(false);//for geolocation algorithm
 	var overshot = useRef(0);
 	//let phaseNum = 0;
 
@@ -151,28 +152,37 @@ function App() {
 			simState.current.paths.filter((obj) => obj.id===31)[0]
 		]
 
-let carPlacements = [
-	[
-		new traffic.Car({id: 7, desiredDir: 'e'}),
-		new traffic.Delay({delay: 5000}),
-		new traffic.Car({id: 6, desiredDir: 'e'}),
-		new traffic.Car({id: 5, desiredDir: 'e'}),
-		new traffic.Car({id: 4, desiredDir: 'e'}),
-		new traffic.Car({id: 3, desiredDir: 'e'}),
-		new traffic.Car({id: 2, desiredDir: 'e'}),
-		new traffic.Delay({delay: 2000}),
-		new traffic.Car({id: 1, desiredDir: 'e'})
-	],
-	[
-		new traffic.Car({id: 11, desiredDir: 's'}),
-		new traffic.Car({id: 10, desiredDir: 's'}),
-		new traffic.Car({id: 9, desiredDir: 's'}),
-		new traffic.Car({id: 8, desiredDir: 's'}),
-		new traffic.Delay({delay: 5000})
-	],
-	[],
-	[]
-]
+		let carPlacements = [
+			[
+				new traffic.Car({id: 5, desiredDir: 's'}),
+				new traffic.Car({id: 4, desiredDir: 'n'}),
+				new traffic.Car({id: 3, desiredDir: 's'}),
+				new traffic.Car({id: 2, desiredDir: 'n'}),
+				new traffic.Car({id: 1, desiredDir: 'n'})
+			],
+			[
+				new traffic.Car({id: 9, desiredDir: 's'}),
+				new traffic.Car({id: 8, desiredDir: 'e'}),
+				new traffic.Car({id: 7, desiredDir: 'e'}),
+				new traffic.Car({id: 6, desiredDir: 's'})
+			],
+			[
+				new traffic.Car({id: 15, desiredDir: 's'}),
+				new traffic.Car({id: 14, desiredDir: 'n'}),
+				new traffic.Car({id: 13, desiredDir: 's'}),
+				new traffic.Car({id: 12, desiredDir: 's'}),
+				new traffic.Car({id: 11, desiredDir: 'n'}),
+				new traffic.Car({id: 10, desiredDir: 's'})
+			],
+			[
+				new traffic.Car({id: 20, desiredDir: 'e'}),
+				new traffic.Car({id: 19, desiredDir: 'w'}),
+				new traffic.Car({id: 18, desiredDir: 'n'}),
+				new traffic.Car({id: 17, desiredDir: 'e'}),
+				new traffic.Car({id: 16, desiredDir: 'n'})
+			]
+		]
+		
 		//let carPlacements = generateCarPlacements();
 
 		let repr = "let carPlacements = [\n";
@@ -267,16 +277,18 @@ let carPlacements = [
 			});
 
 			if(numCars > 0) {
-				return true;
+				return numCars;
 			}
-			return false;
+			return 0;
 		}
 
 		//Might not need this function later.
 		//Cleaning up variables set in last simulation(stale values).
 		const resetSharedSettings = () => {
 			timeTilNextPhase.current = null;
-			pathGroupsInInt[allowedPaths.current.join(",")][0].path.material.color = new Color(0xff0000);
+			if(allowedPaths.current.length) {
+				pathGroupsInInt[allowedPaths.current.join(",")][0].path.material.color = new Color(0xff0000);
+			}
 			allowedPaths.current = [];
 		};
 
@@ -565,7 +577,7 @@ let carPlacements = [
 				}
 				
 			} else if(simulationMode === "Geolocation-enabled") {
-				if(carsLeftOnPaths(simState.current.paths, [1,2,3,6,11,12,13,16,21,22,23,26,31,32,33,36])) {
+				if(carsLeftOnPaths(simState.current.paths, [1,2,3,6,11,12,13,16,21,22,23,26,31,32,33,36]) > 0) {
 
 					let numStoppedCarsInPathsDeterministic = {};
 					//past the deterministic range we have to weigh the stopped cars 33.33% and 66.67%
@@ -600,7 +612,7 @@ let carPlacements = [
 					//Old version, if you use this instead of the above, also update the greentime needed formula in calcCtescvp
 					//let currentDiscount = 2800;
 
-					if(now >= targetPhaseTime.current-currentDiscount && canDoEarlyCalc.current) {
+					if(now >= targetPhaseTime.current-currentDiscount && canDoEarlyCalc.current) {/*Catch all as when car is moving it might not hit 0.9/(26/30) exactly(checked higher up), hence this check*/
 						console.log("Doing another calculation as there might be a possibility on continuing the current phase");
 						couldCalcGeolocationPhasing.current = true;
 						canDoEarlyCalc.current = false;
@@ -611,6 +623,22 @@ let carPlacements = [
 						canDoRegularCalc.current = false;
 					}
 
+					let yellow = false;
+					if(now >= targetPhaseTime.current-currentDiscount && couldCalcGeolocationPhasing.current) {
+						yellowTargetTime.current = now + 1000;
+						if(carsLeftOnPaths(simState.current.paths, [1,2,3,6,11,12,13,16,21,22,23,26,31,32,33,36]) === 1) {
+							yellowTargetTime.current = now;
+						}
+					}
+					if(now >= targetPhaseTime.current && couldCalcGeolocationPhasing.current) {
+						yellowTargetTime.current = now + 2800;
+					}
+					if(yellowTargetTime.current && now >= yellowTargetTime.current) {
+						if(allowedPaths.current.length) {
+							pathGroupsInInt[allowedPaths.current.join(",")][0].path.material.color = new Color(0xffff00);//yellow
+						}
+						yellow = true;
+					}
 					if(couldCalcGeolocationPhasing.current &&
 						(now >= targetPhaseTime.current-currentDiscount || targetPhaseTime.current === Infinity)
 					) {
@@ -666,14 +694,27 @@ let carPlacements = [
 						console.log(`Should run ${cheapestEmptyingGroupId} for ${ctescvp[cheapestEmptyingGroupId].greenTimeNeeded}ms as it's cost is ${ctescvp[cheapestEmptyingGroupId].costToRun}(cheapest)` );
 
 						let targetPhaseTimeBase = targetPhaseTime.current === Infinity ? now : targetPhaseTime.current;	//might be an ugly now value that affects sim time being reproducible?
+
 						if(now >= targetPhaseTime.current || targetPhaseTime.current === Infinity) {
+							if(allowedPaths.current.length) {
+								pathGroupsInInt[allowedPaths.current.join(",")][0].path.material.color = new Color(0xff0000);//red
+							}
 							allowedPaths.current = cheapestEmptyingGroupId.split(',').map((str) => parseInt(str));
+							if(!yellow) {
+								pathGroupsInInt[allowedPaths.current.join(",")][0].path.material.color = new Color(0x00ff00);//green
+							}
+							
 							targetPhaseTime.current = targetPhaseTimeBase + ctescvp[cheapestEmptyingGroupId].greenTimeNeeded;
 							canDoEarlyCalc.current = true;
 							
 						} else {
 							if(cheapestEmptyingGroupId === allowedPaths.current.join(',')) {
 								targetPhaseTime.current = targetPhaseTimeBase + ctescvp[cheapestEmptyingGroupId].greenTimeNeeded;
+								if(!yellow) {
+									pathGroupsInInt[allowedPaths.current.join(",")][0].path.material.color = new Color(0x00ff00);//green
+								}
+							} else {
+								pathGroupsInInt[allowedPaths.current.join(",")][0].path.material.color = new Color(0xffff00);//yellow
 							}
 						}
 						canDoRegularCalc.current = true;
@@ -681,7 +722,9 @@ let carPlacements = [
 						couldCalcGeolocationPhasing.current = false;
 					}
 					timeTilNextPhase.current = targetPhaseTime.current-now;
-					//console.log("timeTilNextPhase: "+timeTilNextPhase.current);
+					console.log("timeTilNextPhase: "+timeTilNextPhase.current);
+				} else if(carsLeftOnPaths(simState.current.paths, [1,2,3,4,6,7,9,11,12,13,14,16,17,19,21,22,23,24,26,27,29,31,32,33,34,36,37,39]) === 0 && allowedPaths.current.length) {
+					pathGroupsInInt[allowedPaths.current.join(",")][0].path.material.color = new Color(0xff0000);//red
 				}
 			}
 
@@ -689,7 +732,7 @@ let carPlacements = [
 				tryPlacingNextInitialCar(delta);
 			}
 
-			if(carsLeftOnPaths(simState.current.paths)) {
+			if(carsLeftOnPaths(simState.current.paths) > 0) {
 				simState.current.prevFramePaths = JSON.parse(JSON.stringify(simState.current.paths, removeCircularRefCausingPrevPath)); //store paths from last frame (deep clone)
 				traffic.progressCars(simState.current, scene.current, delta, allowedPaths.current, timeTilNextPhase.current);
 			} else {
