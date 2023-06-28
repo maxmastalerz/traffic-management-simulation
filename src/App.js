@@ -11,7 +11,6 @@ import traffic from "./js/traffic";
 function App() {
 	const mount = useRef(null);
 	const requestIdRef = useRef(null);
-	//const startTime = useRef(undefined);
 	const prevTime = useRef(undefined);
 	const simulationModeLastSeen = useRef("Pre-timed");
 	const [simulationMode, setSimulationMode] = useState("Pre-timed"); //Pre-timed, Fully-actuated, Geolocation-enabled
@@ -20,7 +19,6 @@ function App() {
 	let simState = useRef({carStopTimes: {}, paths: null, prevFramePaths: null, printedSimResults: false});
 	let allowedPaths = useRef([]);
 	var keepTryingToPlaceCars = useRef(true);
-	let phaseStartTime = useRef(null);
 	//var preTimedInterval = useRef(null);
 	let timeTilNextPhase = useRef(null);
 	var preTimedNumPhasesPassed = useRef(0);
@@ -52,7 +50,6 @@ function App() {
 
 	/*This makes sure that on remount(for example, when you live reload code), that the simulation phases run from the beggining.*/
 	const resetSimSettings = (now) => {
-		phaseStartTime.current = null;
 		prevTime.current = undefined;
 	}
 
@@ -429,14 +426,7 @@ function App() {
 				return;
 			}
 
-			//if(startTime.current === undefined) {//Just nice to know, not currently used anywhere.
-			//	startTime.current = now;
-			//}
-
 			if(simulationMode === "Pre-timed") {
-				if(phaseStartTime.current === null) {
-					phaseStartTime.current = now;
-				}
 
 				//console.log("[1] now:"+now+"   target phase time:"+targetPhaseTime.current);
 
@@ -448,7 +438,6 @@ function App() {
 					
 					preTimedNumPhasesPassed.current++;
 					//console.log("[2] phase: "+preTimedNumPhasesPassed.current%4+" (started "+overshot.current+"ms late)");
-					phaseStartTime.current = now;
 					targetPhaseTime.current = targetPhaseTime.current + preTimedPhaseTime; //(preTimedPhaseTime * (preTimedNumPhasesPassed.current + 1));
 
 					//console.log("Phase changed to: "+preTimedNumPhasesPassed.current);
@@ -466,9 +455,6 @@ function App() {
 				timeTilNextPhase.current = targetPhaseTime.current-now+(overshot.current);
 
 			} else if(simulationMode === "Fully-actuated") {
-				if(phaseStartTime.current === null) {
-					phaseStartTime.current = now;
-				}
 
 				pathGroupsLeadingUpToInt.forEach((pathGroup) => {
 					let path1Actuated = false;
@@ -721,9 +707,12 @@ function App() {
 						couldCalcGeolocationPhasing.current = false;
 					}
 					timeTilNextPhase.current = targetPhaseTime.current-now;
-					console.log("timeTilNextPhase: "+timeTilNextPhase.current);
-				} else if(carsLeftOnPaths(simState.current.paths, [1,2,3,4,6,7,9,11,12,13,14,16,17,19,21,22,23,24,26,27,29,31,32,33,34,36,37,39]) === 0 && allowedPaths.current.length) {
+					//console.log("timeTilNextPhase: "+timeTilNextPhase.current);
+				} else if(carsLeftOnPaths(simState.current.paths, [1,2,3,4,6,7,9,11,12,13,14,16,17,19,21,22,23,24,26,27,29,31,32,33,34,36,37,39]) === 0 &&
+						allowedPaths.current.length &&
+						now >= targetPhaseTime.current) {
 					pathGroupsInInt[allowedPaths.current.join(",")][0].path.material.color = new Color(0xff0000);//red
+					allowedPaths.current = [];
 				}
 			}
 
