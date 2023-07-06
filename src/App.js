@@ -61,6 +61,91 @@ function App() {
 		}
 	};
 
+	const shuffle = (array) => {
+		let currentIndex = array.length,  randomIndex;
+		while (currentIndex !== 0) {
+			randomIndex = Math.floor(Math.random() * currentIndex);
+			currentIndex--;
+			[array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+		}
+		return array;
+	};
+
+	function generateRandomPositiveIntegersWithSum(M, x) {
+		const randomIntegers = [];
+
+		// Generate x random integers between 1 and M-(x-1)
+		let remainingSum = M;
+		for (let i = 0; i < x - 1; i++) {
+			const randomInteger = Math.floor(Math.random() * (remainingSum - (x - i - 1))) + 1;
+			randomIntegers.push(randomInteger);
+			remainingSum -= randomInteger;
+		}
+
+		// The last integer is the remaining sum
+		randomIntegers.push(remainingSum);
+
+		// Return the array of random integers
+		return shuffle(randomIntegers);
+	}
+
+	const insertDelays = (carPlacements, density = 2) => {
+		if(density === 3) {
+			return carPlacements;
+		}
+
+		let numWCars = carPlacements[0].length;
+		let numNCars = carPlacements[1].length;
+		let numECars = carPlacements[2].length;
+		let numSCars = carPlacements[3].length;
+
+		let WDelays = {
+			"2": generateRandomPositiveIntegersWithSum(150*(numWCars-1),numWCars-1).map((e)=>e*10),
+			"1": generateRandomPositiveIntegersWithSum(300*(numWCars-1),numWCars-1).map((e)=>e*10)
+		}
+		let NDelays = {
+			"2": generateRandomPositiveIntegersWithSum(150*(numNCars-1),numNCars-1).map((e)=>e*10),
+			"1": generateRandomPositiveIntegersWithSum(300*(numNCars-1),numNCars-1).map((e)=>e*10)
+		}
+		let EDelays = {
+			"2": generateRandomPositiveIntegersWithSum(150*(numECars-1),numECars-1).map((e)=>e*10),
+			"1": generateRandomPositiveIntegersWithSum(300*(numECars-1),numECars-1).map((e)=>e*10)
+		}
+		let SDelays = {
+			"2": generateRandomPositiveIntegersWithSum(150*(numSCars-1),numSCars-1).map((e)=>e*10),
+			"1": generateRandomPositiveIntegersWithSum(300*(numSCars-1),numSCars-1).map((e)=>e*10)
+		}
+
+		for(let i=1; i<carPlacements[0].length; i+=2) {
+			carPlacements[0].splice(i,0,new traffic.Delay({delay: WDelays[density][(i-1)/2] }));
+		}
+		for(let i=1; i<carPlacements[1].length; i+=2) {
+			carPlacements[1].splice(i,0,new traffic.Delay({delay: NDelays[density][(i-1)/2] }));
+		}
+		for(let i=1; i<carPlacements[2].length; i+=2) {
+			carPlacements[2].splice(i,0,new traffic.Delay({delay: EDelays[density][(i-1)/2] }));
+		}
+		for(let i=1; i<carPlacements[3].length; i+=2) {
+			carPlacements[3].splice(i,0,new traffic.Delay({delay: SDelays[density][(i-1)/2] }));
+		}
+
+		return carPlacements;
+	};
+
+	/*
+	Can generate car placements with differing levels of density()
+	for east/west routes:
+	light density(1) would be  x...x...x 3s avg gap = 6s gap over 2 numbers
+	medium density(2) would be  x.x..x.x or x..x.x..x 1.5s gap avg = 4(50% chance) or 5(50% chance) sec gap over 3 numbers.
+	heavy density(3) would be  xxxxxxxxx
+
+	for north/south routes:
+	light density(1) would be   x...x 3s avg gap = 3 sec gap in 1 number
+	medium density(2) would be x..x.x or x.x..x 1.5s gap avg = 3s gap over 2 numbers.  
+	heavy density(3) would be  xxxxxx  no gaps(0s gap over 0 or any number of numbers)
+
+	with gaps, max number of cars changes.
+	*/
 	const generateCarPlacements = () => {
 		let carPlacements = [
 			[],//will be placed on path 1
@@ -68,21 +153,35 @@ function App() {
 			[],//will be placed on path 21
 			[]//will be placed on path 31
 		];
+
 		let numWCars = Math.floor(Math.random()*9)+1;
 		let numNCars = Math.floor(Math.random()*6)+1;
 		let numECars = Math.floor(Math.random()*9)+1;
 		let numSCars = Math.floor(Math.random()*6)+1;
+
 		for(let i=0; i<numWCars; i++) {
 			carPlacements[0].unshift(new traffic.Car({id: i+1, desiredDir: ['n','e','s'][Math.floor(Math.random()*3)]}));
+			/*if(density !== 3 && i !== numWCars-1) {
+				carPlacements[0].unshift(new traffic.Delay({delay: WDelays[density][i] }));
+			}*/
 		}
 		for(let i=0; i<numNCars; i++) {
 			carPlacements[1].unshift(new traffic.Car({id: numWCars+i+1, desiredDir: ['e','s','w'][Math.floor(Math.random()*3)]}));
+			/*if(density !== 3 && i !== numNCars-1) {
+				carPlacements[1].unshift(new traffic.Delay({delay: NDelays[density][i] }));
+			}*/
 		}
 		for(let i=0; i<numECars; i++) {
 			carPlacements[2].unshift(new traffic.Car({id: numWCars+numNCars+i+1, desiredDir: ['n','s','w'][Math.floor(Math.random()*3)]}));
+			/*if(density !== 3 && i !== numECars-1) {
+				carPlacements[2].unshift(new traffic.Delay({delay: EDelays[density][i] }));
+			}*/
 		}
 		for(let i=0; i<numSCars; i++) {
 			carPlacements[3].unshift(new traffic.Car({id: numWCars+numNCars+numECars+i+1, desiredDir: ['n','e','w'][Math.floor(Math.random()*3)]}));
+			/*if(density !== 3 && i !== numSCars-1) {
+				carPlacements[3].unshift(new traffic.Delay({delay: SDelays[density][i] }));
+			}*/
 		}
 
 		return carPlacements;
@@ -148,45 +247,42 @@ function App() {
 			simState.current.paths.filter((obj) => obj.id===31)[0]
 		]
 
-		let carPlacements = [
+		/*let carPlacements = [
 			[
-				new traffic.Car({id: 5, desiredDir: 's'}),
-				new traffic.Car({id: 4, desiredDir: 'n'}),
-				new traffic.Car({id: 3, desiredDir: 's'}),
-				new traffic.Car({id: 2, desiredDir: 'n'}),
-				new traffic.Car({id: 1, desiredDir: 'n'})
-			],
-			[
-				new traffic.Car({id: 9, desiredDir: 's'}),
-				new traffic.Car({id: 8, desiredDir: 'e'}),
 				new traffic.Car({id: 7, desiredDir: 'e'}),
-				new traffic.Car({id: 6, desiredDir: 's'})
+				new traffic.Delay({delay: 5000}),
+				new traffic.Car({id: 6, desiredDir: 'e'}),
+				new traffic.Car({id: 5, desiredDir: 'e'}),
+				new traffic.Car({id: 4, desiredDir: 'e'}),
+				new traffic.Car({id: 3, desiredDir: 'e'}),
+				new traffic.Car({id: 2, desiredDir: 'e'}),
+				new traffic.Delay({delay: 2000}),
+				new traffic.Car({id: 1, desiredDir: 'e'})
 			],
 			[
-				new traffic.Car({id: 15, desiredDir: 's'}),
-				new traffic.Car({id: 14, desiredDir: 'n'}),
-				new traffic.Car({id: 13, desiredDir: 's'}),
-				new traffic.Car({id: 12, desiredDir: 's'}),
-				new traffic.Car({id: 11, desiredDir: 'n'}),
-				new traffic.Car({id: 10, desiredDir: 's'})
+				new traffic.Car({id: 11, desiredDir: 's'}),
+				new traffic.Car({id: 10, desiredDir: 's'}),
+				new traffic.Car({id: 9, desiredDir: 's'}),
+				new traffic.Car({id: 8, desiredDir: 's'}),
+				new traffic.Delay({delay: 5000})
 			],
-			[
-				new traffic.Car({id: 20, desiredDir: 'e'}),
-				new traffic.Car({id: 19, desiredDir: 'w'}),
-				new traffic.Car({id: 18, desiredDir: 'n'}),
-				new traffic.Car({id: 17, desiredDir: 'e'}),
-				new traffic.Car({id: 16, desiredDir: 'n'})
-			]
-		]
+			[],
+			[]
+		]*/
 
-		//let carPlacements = generateCarPlacements();
+		let carPlacements = generateCarPlacements();
+		carPlacements = insertDelays(carPlacements, 2); //1=light, 2=medium, 3=heavy density(no delays)
 
 		let repr = "let carPlacements = [\n";
 		for(let i=0;i<carPlacements.length;i++) {
 			repr += "\t[\n";
 
 			for(let j=0;j<carPlacements[i].length;j++) {
-				repr += "\t\tnew traffic.Car({id: "+carPlacements[i][j].id+", desiredDir: '"+carPlacements[i][j].desiredDir+"'})";
+				if(carPlacements[i][j] instanceof traffic.Car) {
+					repr += "\t\tnew traffic.Car({id: "+carPlacements[i][j].id+", desiredDir: '"+carPlacements[i][j].desiredDir+"'})";
+				} else if(carPlacements[i][j] instanceof traffic.Delay) {
+					repr += "\t\tnew traffic.Delay({delay: "+carPlacements[i][j].delay+"})";
+				}
 				if(j!==carPlacements[i].length-1) {
 					repr += ",\n";
 				}
