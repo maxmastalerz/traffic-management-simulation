@@ -30,6 +30,8 @@ You can now edit the carPlacements to your liking with differing gaps, and vehic
 
 You may also insert delays programatically by adding back the insertDelays line and not including delays in the carPlacements block.
 
+Please view the results of your test case in the developer console(Wait for all cars to disappear).
+
 ## Test Cases
 
 To view the test cases upon which the study was conducted, please see the following files:

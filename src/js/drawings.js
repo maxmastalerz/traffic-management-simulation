@@ -162,7 +162,7 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		path4Points.add(path4LineCurve);
 		let points4 = path4Points.curves.reduce((p, d)=> [...p, ...d.getSpacedPoints(20)], []);
 		const geometry4 = new BufferGeometry().setFromPoints( points4 );
-		let materialPhaseId = (i%2==0) ? 6 : 8;
+		let materialPhaseId = (i%2===0) ? 6 : 8;
 		const path4 = new Line( geometry4, bgAndPathMaterials[materialPhaseId] );
 		paths.push(new traffic.Path({
 			id: 4+(10*i),
@@ -253,7 +253,7 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		path7Points.add(path7LineCurve);
 		let points7 = path7Points.curves.reduce((p, d)=> [...p, ...d.getPoints(20)], []);
 		const geometry7 = new BufferGeometry().setFromPoints( points7 );
-		materialPhaseId = (i%2==0) ? 7 : 9;
+		materialPhaseId = (i%2===0) ? 7 : 9;
 		const path7 = new Line( geometry7, bgAndPathMaterials[materialPhaseId] );
 		paths.push(new traffic.Path({
 			id: 7+(10*i),
@@ -301,7 +301,7 @@ function drawPaths(scene, WorldSpaceWidth, WorldSpaceHeight) {
 		path9Points.add(path9LineCurve);
 		let points9 = path9Points.curves.reduce((p, d)=> [...p, ...d.getSpacedPoints(20)], []);
 		const geometry9 = new BufferGeometry().setFromPoints( points9 );
-		materialPhaseId = (i%2==0) ? 7 : 9;
+		materialPhaseId = (i%2===0) ? 7 : 9;
 		const path9 = new Line( geometry9, bgAndPathMaterials[materialPhaseId] );
 		paths.push(new traffic.Path({
 			id: 9+(10*i),
