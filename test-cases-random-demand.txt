@@ -1,0 +1,2693 @@
+Description of test cases:
+Random demand from all directions
+1-9 cars from west
+1-9 cars from east
+1-6 cars from north
+1-6 cars from south.
+A test case has heavy, medium, and light traffic.
+Each of the individual subtests contains the same desired car directions.
+
+Test case 1:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 4, desiredDir: 's'}),
+			new traffic.Car({id: 3, desiredDir: 'n'}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'w'}),
+			new traffic.Car({id: 9, desiredDir: 'w'}),
+			new traffic.Car({id: 8, desiredDir: 'e'}),
+			new traffic.Car({id: 7, desiredDir: 'w'}),
+			new traffic.Car({id: 6, desiredDir: 's'}),
+			new traffic.Car({id: 5, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 16, desiredDir: 's'}),
+			new traffic.Car({id: 15, desiredDir: 's'}),
+			new traffic.Car({id: 14, desiredDir: 'w'}),
+			new traffic.Car({id: 13, desiredDir: 'w'}),
+			new traffic.Car({id: 12, desiredDir: 'w'}),
+			new traffic.Car({id: 11, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 18, desiredDir: 'n'}),
+			new traffic.Car({id: 17, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 158.91271200000003s.
+		Average time spent stopped by a car: 8.828484000000001s.
+	actuated:
+		Total time spent stopped by all cars: 164.713176s.
+		Average time spent stopped by a car: 9.150732s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 87.10696800000002s.
+		Average time spent stopped by a car: 4.839276000000002s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 4, desiredDir: 's'}),
+			new traffic.Delay({delay: 2270}),
+			new traffic.Car({id: 3, desiredDir: 'n'}),
+			new traffic.Delay({delay: 2080}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 150}),
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'w'}),
+			new traffic.Delay({delay: 700}),
+			new traffic.Car({id: 9, desiredDir: 'w'}),
+			new traffic.Delay({delay: 2310}),
+			new traffic.Car({id: 8, desiredDir: 'e'}),
+			new traffic.Delay({delay: 180}),
+			new traffic.Car({id: 7, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1590}),
+			new traffic.Car({id: 6, desiredDir: 's'}),
+			new traffic.Delay({delay: 2720}),
+			new traffic.Car({id: 5, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 16, desiredDir: 's'}),
+			new traffic.Delay({delay: 1540}),
+			new traffic.Car({id: 15, desiredDir: 's'}),
+			new traffic.Delay({delay: 870}),
+			new traffic.Car({id: 14, desiredDir: 'w'}),
+			new traffic.Delay({delay: 230}),
+			new traffic.Car({id: 13, desiredDir: 'w'}),
+			new traffic.Delay({delay: 4540}),
+			new traffic.Car({id: 12, desiredDir: 'w'}),
+			new traffic.Delay({delay: 320}),
+			new traffic.Car({id: 11, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 18, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1500}),
+			new traffic.Car({id: 17, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 144.144864s.
+		Average time spent stopped by a car: 8.008048s.
+	actuated:
+		Total time spent stopped by all cars: 219.000852s.
+		Average time spent stopped by a car: 12.166714s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 94.05752399999993s.
+		Average time spent stopped by a car: 5.225417999999996s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 4, desiredDir: 's'}),
+			new traffic.Delay({delay: 2510}),
+			new traffic.Car({id: 3, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1860}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 4630}),
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'w'}),
+			new traffic.Delay({delay: 30}),
+			new traffic.Car({id: 9, desiredDir: 'w'}),
+			new traffic.Delay({delay: 3000}),
+			new traffic.Car({id: 8, desiredDir: 'e'}),
+			new traffic.Delay({delay: 240}),
+			new traffic.Car({id: 7, desiredDir: 'w'}),
+			new traffic.Delay({delay: 9780}),
+			new traffic.Car({id: 6, desiredDir: 's'}),
+			new traffic.Delay({delay: 1950}),
+			new traffic.Car({id: 5, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 16, desiredDir: 's'}),
+			new traffic.Delay({delay: 10670}),
+			new traffic.Car({id: 15, desiredDir: 's'}),
+			new traffic.Delay({delay: 570}),
+			new traffic.Car({id: 14, desiredDir: 'w'}),
+			new traffic.Delay({delay: 500}),
+			new traffic.Car({id: 13, desiredDir: 'w'}),
+			new traffic.Delay({delay: 3160}),
+			new traffic.Car({id: 12, desiredDir: 'w'}),
+			new traffic.Delay({delay: 100}),
+			new traffic.Car({id: 11, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 18, desiredDir: 'n'}),
+			new traffic.Delay({delay: 3000}),
+			new traffic.Car({id: 17, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 205.466436s.
+		Average time spent stopped by a car: 11.414802s.
+	actuated:
+		Total time spent stopped by all cars: 118.69282799999992s.
+		Average time spent stopped by a car: 6.594045999999996s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 74.10592800000013s.
+		Average time spent stopped by a car: 4.116996000000007s.
+
+Test case 2:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 5, desiredDir: 's'}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Car({id: 3, desiredDir: 'e'}),
+			new traffic.Car({id: 2, desiredDir: 'n'}),
+			new traffic.Car({id: 1, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 7, desiredDir: 's'}),
+			new traffic.Car({id: 6, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'n'}),
+			new traffic.Car({id: 9, desiredDir: 'n'}),
+			new traffic.Car({id: 8, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 12, desiredDir: 'e'}),
+			new traffic.Car({id: 11, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 89.04045599999999s.
+		Average time spent stopped by a car: 7.420038s.
+	actuated:
+		Total time spent stopped by all cars: 50.18734800000001s.
+		Average time spent stopped by a car: 4.182279s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 17.20137599999999s.
+		Average time spent stopped by a car: 1.4334479999999992s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 5, desiredDir: 's'}),
+			new traffic.Delay({delay: 960}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Delay({delay: 3680}),
+			new traffic.Car({id: 3, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1030}),
+			new traffic.Car({id: 2, desiredDir: 'n'}),
+			new traffic.Delay({delay: 330}),
+			new traffic.Car({id: 1, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 7, desiredDir: 's'}),
+			new traffic.Delay({delay: 1500}),
+			new traffic.Car({id: 6, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'n'}),
+			new traffic.Delay({delay: 240}),
+			new traffic.Car({id: 9, desiredDir: 'n'}),
+			new traffic.Delay({delay: 2760}),
+			new traffic.Car({id: 8, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 12, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1500}),
+			new traffic.Car({id: 11, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 133.09398000000002s.
+		Average time spent stopped by a car: 11.091165s.
+	actuated:
+		Total time spent stopped by all cars: 66.25529999999998s.
+		Average time spent stopped by a car: 5.5212749999999975s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 18.184787999999987s.
+		Average time spent stopped by a car: 1.5153989999999988s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 5, desiredDir: 's'}),
+			new traffic.Delay({delay: 10220}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1310}),
+			new traffic.Car({id: 3, desiredDir: 'e'}),
+			new traffic.Delay({delay: 240}),
+			new traffic.Car({id: 2, desiredDir: 'n'}),
+			new traffic.Delay({delay: 230}),
+			new traffic.Car({id: 1, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 7, desiredDir: 's'}),
+			new traffic.Delay({delay: 3000}),
+			new traffic.Car({id: 6, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'n'}),
+			new traffic.Delay({delay: 4740}),
+			new traffic.Car({id: 9, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1260}),
+			new traffic.Car({id: 8, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 12, desiredDir: 'e'}),
+			new traffic.Delay({delay: 3000}),
+			new traffic.Car({id: 11, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 125.310024s.
+		Average time spent stopped by a car: 10.442502000000001s.
+	actuated:
+		Total time spent stopped by all cars: 54.95439600000001s.
+		Average time spent stopped by a car: 4.5795330000000005s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 33.13598399999999s.
+		Average time spent stopped by a car: 2.761332s.
+
+Test case 3:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 8, desiredDir: 'e'}),
+			new traffic.Car({id: 7, desiredDir: 's'}),
+			new traffic.Car({id: 6, desiredDir: 'n'}),
+			new traffic.Car({id: 5, desiredDir: 'n'}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Car({id: 3, desiredDir: 'e'}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'e'}),
+			new traffic.Car({id: 9, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Car({id: 14, desiredDir: 'n'}),
+			new traffic.Car({id: 13, desiredDir: 's'}),
+			new traffic.Car({id: 12, desiredDir: 's'}),
+			new traffic.Car({id: 11, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 17, desiredDir: 'e'}),
+			new traffic.Car({id: 16, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 212.80035599999997s.
+		Average time spent stopped by a car: 12.517667999999999s.
+	actuated:
+		Total time spent stopped by all cars: 107.80862400000007s.
+		Average time spent stopped by a car: 6.341683764705887s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 101.624796s.
+		Average time spent stopped by a car: 5.977929176470589s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 8, desiredDir: 'e'}),
+			new traffic.Delay({delay: 460}),
+			new traffic.Car({id: 7, desiredDir: 's'}),
+			new traffic.Delay({delay: 2430}),
+			new traffic.Car({id: 6, desiredDir: 'n'}),
+			new traffic.Delay({delay: 190}),
+			new traffic.Car({id: 5, desiredDir: 'n'}),
+			new traffic.Delay({delay: 990}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Delay({delay: 2410}),
+			new traffic.Car({id: 3, desiredDir: 'e'}),
+			new traffic.Delay({delay: 170}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 3850}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1500}),
+			new traffic.Car({id: 9, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Delay({delay: 5020}),
+			new traffic.Car({id: 14, desiredDir: 'n'}),
+			new traffic.Delay({delay: 660}),
+			new traffic.Car({id: 13, desiredDir: 's'}),
+			new traffic.Delay({delay: 230}),
+			new traffic.Car({id: 12, desiredDir: 's'}),
+			new traffic.Delay({delay: 90}),
+			new traffic.Car({id: 11, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 17, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1500}),
+			new traffic.Car({id: 16, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 222.41779200000002s.
+		Average time spent stopped by a car: 13.083399529411764s.
+	actuated:
+		Total time spent stopped by all cars: 139.76118s.
+		Average time spent stopped by a car: 8.22124588235294s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 76.13942400000006s.
+		Average time spent stopped by a car: 4.478789647058827s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 8, desiredDir: 'e'}),
+			new traffic.Delay({delay: 20}),
+			new traffic.Car({id: 7, desiredDir: 's'}),
+			new traffic.Delay({delay: 80}),
+			new traffic.Car({id: 6, desiredDir: 'n'}),
+			new traffic.Delay({delay: 360}),
+			new traffic.Car({id: 5, desiredDir: 'n'}),
+			new traffic.Delay({delay: 50}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Delay({delay: 13510}),
+			new traffic.Car({id: 3, desiredDir: 'e'}),
+			new traffic.Delay({delay: 4470}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 2510}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'e'}),
+			new traffic.Delay({delay: 3000}),
+			new traffic.Car({id: 9, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Delay({delay: 800}),
+			new traffic.Car({id: 14, desiredDir: 'n'}),
+			new traffic.Delay({delay: 4680}),
+			new traffic.Car({id: 13, desiredDir: 's'}),
+			new traffic.Delay({delay: 3250}),
+			new traffic.Car({id: 12, desiredDir: 's'}),
+			new traffic.Delay({delay: 3270}),
+			new traffic.Car({id: 11, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 17, desiredDir: 'e'}),
+			new traffic.Delay({delay: 3000}),
+			new traffic.Car({id: 16, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 198.21585599999997s.
+		Average time spent stopped by a car: 11.659756235294116s.
+	actuated:
+		Total time spent stopped by all cars: 100.57471200000005s.
+		Average time spent stopped by a car: 5.916159529411767s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 60.48817200000005s.
+		Average time spent stopped by a car: 3.558127764705885s.
+
+Test case 4:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Car({id: 2, desiredDir: 'n'}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 9, desiredDir: 'e'}),
+			new traffic.Car({id: 8, desiredDir: 'e'}),
+			new traffic.Car({id: 7, desiredDir: 's'}),
+			new traffic.Car({id: 6, desiredDir: 'e'}),
+			new traffic.Car({id: 5, desiredDir: 'w'}),
+			new traffic.Car({id: 4, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Car({id: 14, desiredDir: 's'}),
+			new traffic.Car({id: 13, desiredDir: 'n'}),
+			new traffic.Car({id: 12, desiredDir: 's'}),
+			new traffic.Car({id: 11, desiredDir: 's'}),
+			new traffic.Car({id: 10, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 20, desiredDir: 'e'}),
+			new traffic.Car({id: 19, desiredDir: 'n'}),
+			new traffic.Car({id: 18, desiredDir: 'n'}),
+			new traffic.Car({id: 17, desiredDir: 'w'}),
+			new traffic.Car({id: 16, desiredDir: 'n'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 220.83433200000002s.
+		Average time spent stopped by a car: 11.0417166s.
+	actuated:
+		Total time spent stopped by all cars: 144.51156s.
+		Average time spent stopped by a car: 7.225578s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 111.17555999999996s.
+		Average time spent stopped by a car: 5.558777999999998s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Delay({delay: 1850}),
+			new traffic.Car({id: 2, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1150}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 9, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1120}),
+			new traffic.Car({id: 8, desiredDir: 'e'}),
+			new traffic.Delay({delay: 290}),
+			new traffic.Car({id: 7, desiredDir: 's'}),
+			new traffic.Delay({delay: 2890}),
+			new traffic.Car({id: 6, desiredDir: 'e'}),
+			new traffic.Delay({delay: 960}),
+			new traffic.Car({id: 5, desiredDir: 'w'}),
+			new traffic.Delay({delay: 2240}),
+			new traffic.Car({id: 4, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1550}),
+			new traffic.Car({id: 14, desiredDir: 's'}),
+			new traffic.Delay({delay: 1090}),
+			new traffic.Car({id: 13, desiredDir: 'n'}),
+			new traffic.Delay({delay: 270}),
+			new traffic.Car({id: 12, desiredDir: 's'}),
+			new traffic.Delay({delay: 1480}),
+			new traffic.Car({id: 11, desiredDir: 's'}),
+			new traffic.Delay({delay: 3110}),
+			new traffic.Car({id: 10, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 20, desiredDir: 'e'}),
+			new traffic.Delay({delay: 3560}),
+			new traffic.Car({id: 19, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1080}),
+			new traffic.Car({id: 18, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1270}),
+			new traffic.Car({id: 17, desiredDir: 'w'}),
+			new traffic.Delay({delay: 90}),
+			new traffic.Car({id: 16, desiredDir: 'n'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 242.51940000000002s.
+		Average time spent stopped by a car: 12.12597s.
+	actuated:
+		Total time spent stopped by all cars: 175.030668s.
+		Average time spent stopped by a car: 8.7515334s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 134.160732s.
+		Average time spent stopped by a car: 6.7080366s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Delay({delay: 1680}),
+			new traffic.Car({id: 2, desiredDir: 'n'}),
+			new traffic.Delay({delay: 4320}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 9, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1060}),
+			new traffic.Car({id: 8, desiredDir: 'e'}),
+			new traffic.Delay({delay: 810}),
+			new traffic.Car({id: 7, desiredDir: 's'}),
+			new traffic.Delay({delay: 9060}),
+			new traffic.Car({id: 6, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1250}),
+			new traffic.Car({id: 5, desiredDir: 'w'}),
+			new traffic.Delay({delay: 2820}),
+			new traffic.Car({id: 4, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1770}),
+			new traffic.Car({id: 14, desiredDir: 's'}),
+			new traffic.Delay({delay: 940}),
+			new traffic.Car({id: 13, desiredDir: 'n'}),
+			new traffic.Delay({delay: 10420}),
+			new traffic.Car({id: 12, desiredDir: 's'}),
+			new traffic.Delay({delay: 1410}),
+			new traffic.Car({id: 11, desiredDir: 's'}),
+			new traffic.Delay({delay: 460}),
+			new traffic.Car({id: 10, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 20, desiredDir: 'e'}),
+			new traffic.Delay({delay: 150}),
+			new traffic.Car({id: 19, desiredDir: 'n'}),
+			new traffic.Delay({delay: 9720}),
+			new traffic.Car({id: 18, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1340}),
+			new traffic.Car({id: 17, desiredDir: 'w'}),
+			new traffic.Delay({delay: 790}),
+			new traffic.Car({id: 16, desiredDir: 'n'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 179.047656s.
+		Average time spent stopped by a car: 8.952382799999999s.
+	actuated:
+		Total time spent stopped by all cars: 172.36378799999997s.
+		Average time spent stopped by a car: 8.618189399999999s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 107.85862799999997s.
+		Average time spent stopped by a car: 5.392931399999998s.
+
+Test case 5:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 5, desiredDir: 's'}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Car({id: 3, desiredDir: 'n'}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Car({id: 1, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 7, desiredDir: 'e'}),
+			new traffic.Car({id: 6, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 8, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 11, desiredDir: 'e'}),
+			new traffic.Car({id: 10, desiredDir: 'e'}),
+			new traffic.Car({id: 9, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 95.39096400000001s.
+		Average time spent stopped by a car: 8.671905818181818s.
+	actuated:
+		Total time spent stopped by all cars: 56.904552000000024s.
+		Average time spent stopped by a car: 5.173141090909093s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 27.10216800000009s.
+		Average time spent stopped by a car: 2.463833454545463s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 5, desiredDir: 's'}),
+			new traffic.Delay({delay: 50}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1360}),
+			new traffic.Car({id: 3, desiredDir: 'n'}),
+			new traffic.Delay({delay: 4550}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 40}),
+			new traffic.Car({id: 1, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 7, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1500}),
+			new traffic.Car({id: 6, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 8, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 11, desiredDir: 'e'}),
+			new traffic.Delay({delay: 510}),
+			new traffic.Car({id: 10, desiredDir: 'e'}),
+			new traffic.Delay({delay: 2490}),
+			new traffic.Car({id: 9, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 91.19062800000002s.
+		Average time spent stopped by a car: 8.290057090909091s.
+	actuated:
+		Total time spent stopped by all cars: 69.92225999999998s.
+		Average time spent stopped by a car: 6.356569090909089s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 37.68634799999994s.
+		Average time spent stopped by a car: 3.4260316363636307s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 5, desiredDir: 's'}),
+			new traffic.Delay({delay: 830}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Delay({delay: 230}),
+			new traffic.Car({id: 3, desiredDir: 'n'}),
+			new traffic.Delay({delay: 9180}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1760}),
+			new traffic.Car({id: 1, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 7, desiredDir: 'e'}),
+			new traffic.Delay({delay: 3000}),
+			new traffic.Car({id: 6, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 8, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 11, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1000}),
+			new traffic.Car({id: 10, desiredDir: 'e'}),
+			new traffic.Delay({delay: 5000}),
+			new traffic.Car({id: 9, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 88.073712s.
+		Average time spent stopped by a car: 8.00670109090909s.
+	actuated:
+		Total time spent stopped by all cars: 44.970264000000014s.
+		Average time spent stopped by a car: 4.0882058181818195s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 20.86833600000004s.
+		Average time spent stopped by a car: 1.8971214545454582s.
+
+Test case 6:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Car({id: 2, desiredDir: 's'}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 4, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 6, desiredDir: 'w'}),
+			new traffic.Car({id: 5, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 9, desiredDir: 'w'}),
+			new traffic.Car({id: 8, desiredDir: 'w'}),
+			new traffic.Car({id: 7, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 50.02066799999999s.
+		Average time spent stopped by a car: 5.557851999999999s.
+	actuated:
+		Total time spent stopped by all cars: 38.203056s.
+		Average time spent stopped by a car: 4.244783999999999s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 18.801503999999987s.
+		Average time spent stopped by a car: 2.0890559999999985s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Delay({delay: 60}),
+			new traffic.Car({id: 2, desiredDir: 's'}),
+			new traffic.Delay({delay: 2940}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 4, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 6, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1500}),
+			new traffic.Car({id: 5, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 9, desiredDir: 'w'}),
+			new traffic.Delay({delay: 2620}),
+			new traffic.Car({id: 8, desiredDir: 'w'}),
+			new traffic.Delay({delay: 380}),
+			new traffic.Car({id: 7, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 85.57351200000001s.
+		Average time spent stopped by a car: 9.508168s.
+	actuated:
+		Total time spent stopped by all cars: 45.87033599999998s.
+		Average time spent stopped by a car: 5.096703999999998s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 19.634903999999995s.
+		Average time spent stopped by a car: 2.1816559999999994s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Delay({delay: 3430}),
+			new traffic.Car({id: 2, desiredDir: 's'}),
+			new traffic.Delay({delay: 2570}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 4, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 6, desiredDir: 'w'}),
+			new traffic.Delay({delay: 3000}),
+			new traffic.Car({id: 5, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 9, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1880}),
+			new traffic.Car({id: 8, desiredDir: 'w'}),
+			new traffic.Delay({delay: 4120}),
+			new traffic.Car({id: 7, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 74.355948s.
+		Average time spent stopped by a car: 8.261772s.
+	actuated:
+		Total time spent stopped by all cars: 56.587859999999985s.
+		Average time spent stopped by a car: 6.287539999999998s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 33.169320000000006s.
+		Average time spent stopped by a car: 3.685480000000001s.
+
+Test case 7:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 8, desiredDir: 'n'}),
+			new traffic.Car({id: 7, desiredDir: 'e'}),
+			new traffic.Car({id: 6, desiredDir: 'n'}),
+			new traffic.Car({id: 5, desiredDir: 's'}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Car({id: 3, desiredDir: 'n'}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 9, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 16, desiredDir: 'w'}),
+			new traffic.Car({id: 15, desiredDir: 'n'}),
+			new traffic.Car({id: 14, desiredDir: 'n'}),
+			new traffic.Car({id: 13, desiredDir: 'n'}),
+			new traffic.Car({id: 12, desiredDir: 'n'}),
+			new traffic.Car({id: 11, desiredDir: 'n'}),
+			new traffic.Car({id: 10, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 17, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 159.46275599999998s.
+		Average time spent stopped by a car: 9.380162117647059s.
+	actuated:
+		Total time spent stopped by all cars: 121.90975199999991s.
+		Average time spent stopped by a car: 7.171161882352935s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 47.52046799999991s.
+		Average time spent stopped by a car: 2.795321647058818s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 8, desiredDir: 'n'}),
+			new traffic.Delay({delay: 3000}),
+			new traffic.Car({id: 7, desiredDir: 'e'}),
+			new traffic.Delay({delay: 400}),
+			new traffic.Car({id: 6, desiredDir: 'n'}),
+			new traffic.Delay({delay: 5410}),
+			new traffic.Car({id: 5, desiredDir: 's'}),
+			new traffic.Delay({delay: 100}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1380}),
+			new traffic.Car({id: 3, desiredDir: 'n'}),
+			new traffic.Delay({delay: 190}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 20}),
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 9, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 16, desiredDir: 'w'}),
+			new traffic.Delay({delay: 220}),
+			new traffic.Car({id: 15, desiredDir: 'n'}),
+			new traffic.Delay({delay: 740}),
+			new traffic.Car({id: 14, desiredDir: 'n'}),
+			new traffic.Delay({delay: 400}),
+			new traffic.Car({id: 13, desiredDir: 'n'}),
+			new traffic.Delay({delay: 7540}),
+			new traffic.Car({id: 12, desiredDir: 'n'}),
+			new traffic.Delay({delay: 60}),
+			new traffic.Car({id: 11, desiredDir: 'n'}),
+			new traffic.Delay({delay: 40}),
+			new traffic.Car({id: 10, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 17, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 182.614608s.
+		Average time spent stopped by a car: 10.742035764705882s.
+	actuated:
+		Total time spent stopped by all cars: 73.45587599999993s.
+		Average time spent stopped by a car: 4.320933882352937s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 21.13502400000006s.
+		Average time spent stopped by a car: 1.2432367058823566s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 8, desiredDir: 'n'}),
+			new traffic.Delay({delay: 7840}),
+			new traffic.Car({id: 7, desiredDir: 'e'}),
+			new traffic.Delay({delay: 380}),
+			new traffic.Car({id: 6, desiredDir: 'n'}),
+			new traffic.Delay({delay: 7730}),
+			new traffic.Car({id: 5, desiredDir: 's'}),
+			new traffic.Delay({delay: 130}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Delay({delay: 820}),
+			new traffic.Car({id: 3, desiredDir: 'n'}),
+			new traffic.Delay({delay: 4000}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 100}),
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 9, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 16, desiredDir: 'w'}),
+			new traffic.Delay({delay: 8970}),
+			new traffic.Car({id: 15, desiredDir: 'n'}),
+			new traffic.Delay({delay: 3460}),
+			new traffic.Car({id: 14, desiredDir: 'n'}),
+			new traffic.Delay({delay: 240}),
+			new traffic.Car({id: 13, desiredDir: 'n'}),
+			new traffic.Delay({delay: 2020}),
+			new traffic.Car({id: 12, desiredDir: 'n'}),
+			new traffic.Delay({delay: 2900}),
+			new traffic.Car({id: 11, desiredDir: 'n'}),
+			new traffic.Delay({delay: 410}),
+			new traffic.Car({id: 10, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 17, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 166.83001200000004s.
+		Average time spent stopped by a car: 9.813530117647062s.
+	actuated:
+		Total time spent stopped by all cars: 66.07195200000002s.
+		Average time spent stopped by a car: 3.886585411764707s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 28.618956000000004s.
+		Average time spent stopped by a car: 1.6834680000000004s.
+
+Test case 8:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 8, desiredDir: 's'}),
+			new traffic.Car({id: 7, desiredDir: 'n'}),
+			new traffic.Car({id: 6, desiredDir: 's'}),
+			new traffic.Car({id: 5, desiredDir: 's'}),
+			new traffic.Car({id: 4, desiredDir: 's'}),
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Car({id: 2, desiredDir: 's'}),
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 12, desiredDir: 'e'}),
+			new traffic.Car({id: 11, desiredDir: 'e'}),
+			new traffic.Car({id: 10, desiredDir: 's'}),
+			new traffic.Car({id: 9, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 17, desiredDir: 'w'}),
+			new traffic.Car({id: 16, desiredDir: 'w'}),
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Car({id: 14, desiredDir: 's'}),
+			new traffic.Car({id: 13, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 21, desiredDir: 'n'}),
+			new traffic.Car({id: 20, desiredDir: 'w'}),
+			new traffic.Car({id: 19, desiredDir: 'w'}),
+			new traffic.Car({id: 18, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 203.866308s.
+		Average time spent stopped by a car: 9.707919428571428s.
+	actuated:
+		Total time spent stopped by all cars: 224.16793200000006s.
+		Average time spent stopped by a car: 10.674663428571431s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 117.50939999999997s.
+		Average time spent stopped by a car: 5.595685714285713s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 8, desiredDir: 's'}),
+			new traffic.Delay({delay: 920}),
+			new traffic.Car({id: 7, desiredDir: 'n'}),
+			new traffic.Delay({delay: 80}),
+			new traffic.Car({id: 6, desiredDir: 's'}),
+			new traffic.Delay({delay: 460}),
+			new traffic.Car({id: 5, desiredDir: 's'}),
+			new traffic.Delay({delay: 300}),
+			new traffic.Car({id: 4, desiredDir: 's'}),
+			new traffic.Delay({delay: 3340}),
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Delay({delay: 4680}),
+			new traffic.Car({id: 2, desiredDir: 's'}),
+			new traffic.Delay({delay: 720}),
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 12, desiredDir: 'e'}),
+			new traffic.Delay({delay: 230}),
+			new traffic.Car({id: 11, desiredDir: 'e'}),
+			new traffic.Delay({delay: 970}),
+			new traffic.Car({id: 10, desiredDir: 's'}),
+			new traffic.Delay({delay: 3300}),
+			new traffic.Car({id: 9, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 17, desiredDir: 'w'}),
+			new traffic.Delay({delay: 3740}),
+			new traffic.Car({id: 16, desiredDir: 'w'}),
+			new traffic.Delay({delay: 270}),
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1800}),
+			new traffic.Car({id: 14, desiredDir: 's'}),
+			new traffic.Delay({delay: 190}),
+			new traffic.Car({id: 13, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 21, desiredDir: 'n'}),
+			new traffic.Delay({delay: 2480}),
+			new traffic.Car({id: 20, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1430}),
+			new traffic.Car({id: 19, desiredDir: 'w'}),
+			new traffic.Delay({delay: 590}),
+			new traffic.Car({id: 18, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 256.77054000000004s.
+		Average time spent stopped by a car: 12.227168571428574s.
+	actuated:
+		Total time spent stopped by all cars: 224.95132800000005s.
+		Average time spent stopped by a car: 10.711968000000002s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 111.22556400000008s.
+		Average time spent stopped by a car: 5.2964554285714325s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 8, desiredDir: 's'}),
+			new traffic.Delay({delay: 240}),
+			new traffic.Car({id: 7, desiredDir: 'n'}),
+			new traffic.Delay({delay: 2170}),
+			new traffic.Car({id: 6, desiredDir: 's'}),
+			new traffic.Delay({delay: 970}),
+			new traffic.Car({id: 5, desiredDir: 's'}),
+			new traffic.Delay({delay: 1220}),
+			new traffic.Car({id: 4, desiredDir: 's'}),
+			new traffic.Delay({delay: 5510}),
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Delay({delay: 3580}),
+			new traffic.Car({id: 2, desiredDir: 's'}),
+			new traffic.Delay({delay: 7310}),
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 12, desiredDir: 'e'}),
+			new traffic.Delay({delay: 3910}),
+			new traffic.Car({id: 11, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1990}),
+			new traffic.Car({id: 10, desiredDir: 's'}),
+			new traffic.Delay({delay: 3100}),
+			new traffic.Car({id: 9, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 17, desiredDir: 'w'}),
+			new traffic.Delay({delay: 5840}),
+			new traffic.Car({id: 16, desiredDir: 'w'}),
+			new traffic.Delay({delay: 210}),
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Delay({delay: 5110}),
+			new traffic.Car({id: 14, desiredDir: 's'}),
+			new traffic.Delay({delay: 840}),
+			new traffic.Car({id: 13, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 21, desiredDir: 'n'}),
+			new traffic.Delay({delay: 2810}),
+			new traffic.Car({id: 20, desiredDir: 'w'}),
+			new traffic.Delay({delay: 5540}),
+			new traffic.Car({id: 19, desiredDir: 'w'}),
+			new traffic.Delay({delay: 650}),
+			new traffic.Car({id: 18, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 217.26738000000006s.
+		Average time spent stopped by a car: 10.346065714285718s.
+	actuated:
+		Total time spent stopped by all cars: 194.01552s.
+		Average time spent stopped by a car: 9.238834285714287s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 105.60844799999994s.
+		Average time spent stopped by a car: 5.028973714285712s.
+
+Test case 9:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 6, desiredDir: 'e'}),
+			new traffic.Car({id: 5, desiredDir: 'e'}),
+			new traffic.Car({id: 4, desiredDir: 'e'}),
+			new traffic.Car({id: 3, desiredDir: 'e'}),
+			new traffic.Car({id: 2, desiredDir: 's'}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'w'}),
+			new traffic.Car({id: 9, desiredDir: 's'}),
+			new traffic.Car({id: 8, desiredDir: 's'}),
+			new traffic.Car({id: 7, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 16, desiredDir: 'w'}),
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Car({id: 14, desiredDir: 'w'}),
+			new traffic.Car({id: 13, desiredDir: 's'}),
+			new traffic.Car({id: 12, desiredDir: 'w'}),
+			new traffic.Car({id: 11, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 18, desiredDir: 'w'}),
+			new traffic.Car({id: 17, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 250.870068s.
+		Average time spent stopped by a car: 13.937226s.
+	actuated:
+		Total time spent stopped by all cars: 116.20929599999994s.
+		Average time spent stopped by a car: 6.456071999999996s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 59.2880760000002s.
+		Average time spent stopped by a car: 3.2937820000000113s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 6, desiredDir: 'e'}),
+			new traffic.Delay({delay: 190}),
+			new traffic.Car({id: 5, desiredDir: 'e'}),
+			new traffic.Delay({delay: 6870}),
+			new traffic.Car({id: 4, desiredDir: 'e'}),
+			new traffic.Delay({delay: 170}),
+			new traffic.Car({id: 3, desiredDir: 'e'}),
+			new traffic.Delay({delay: 100}),
+			new traffic.Car({id: 2, desiredDir: 's'}),
+			new traffic.Delay({delay: 170}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'w'}),
+			new traffic.Delay({delay: 3710}),
+			new traffic.Car({id: 9, desiredDir: 's'}),
+			new traffic.Delay({delay: 440}),
+			new traffic.Car({id: 8, desiredDir: 's'}),
+			new traffic.Delay({delay: 350}),
+			new traffic.Car({id: 7, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 16, desiredDir: 'w'}),
+			new traffic.Delay({delay: 2490}),
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Delay({delay: 600}),
+			new traffic.Car({id: 14, desiredDir: 'w'}),
+			new traffic.Delay({delay: 130}),
+			new traffic.Car({id: 13, desiredDir: 's'}),
+			new traffic.Delay({delay: 2500}),
+			new traffic.Car({id: 12, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1780}),
+			new traffic.Car({id: 11, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 18, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1500}),
+			new traffic.Car({id: 17, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 295.52364s.
+		Average time spent stopped by a car: 16.41798s.
+	actuated:
+		Total time spent stopped by all cars: 134.42742000000007s.
+		Average time spent stopped by a car: 7.468190000000004s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 98.15785200000005s.
+		Average time spent stopped by a car: 5.453214000000003s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 6, desiredDir: 'e'}),
+			new traffic.Delay({delay: 580}),
+			new traffic.Car({id: 5, desiredDir: 'e'}),
+			new traffic.Delay({delay: 4270}),
+			new traffic.Car({id: 4, desiredDir: 'e'}),
+			new traffic.Delay({delay: 6970}),
+			new traffic.Car({id: 3, desiredDir: 'e'}),
+			new traffic.Delay({delay: 440}),
+			new traffic.Car({id: 2, desiredDir: 's'}),
+			new traffic.Delay({delay: 2740}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'w'}),
+			new traffic.Delay({delay: 5170}),
+			new traffic.Car({id: 9, desiredDir: 's'}),
+			new traffic.Delay({delay: 840}),
+			new traffic.Car({id: 8, desiredDir: 's'}),
+			new traffic.Delay({delay: 2990}),
+			new traffic.Car({id: 7, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 16, desiredDir: 'w'}),
+			new traffic.Delay({delay: 6520}),
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Delay({delay: 430}),
+			new traffic.Car({id: 14, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1850}),
+			new traffic.Car({id: 13, desiredDir: 's'}),
+			new traffic.Delay({delay: 1920}),
+			new traffic.Car({id: 12, desiredDir: 'w'}),
+			new traffic.Delay({delay: 4280}),
+			new traffic.Car({id: 11, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 18, desiredDir: 'w'}),
+			new traffic.Delay({delay: 3000}),
+			new traffic.Car({id: 17, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 237.38565600000004s.
+		Average time spent stopped by a car: 13.188092000000003s.
+	actuated:
+		Total time spent stopped by all cars: 94.22420399999997s.
+		Average time spent stopped by a car: 5.234677999999998s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 82.07323200000002s.
+		Average time spent stopped by a car: 4.559624s.
+
+Test case 10:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 2, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 4, desiredDir: 's'}),
+			new traffic.Car({id: 3, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'w'}),
+			new traffic.Car({id: 9, desiredDir: 'e'}),
+			new traffic.Car({id: 8, desiredDir: 'w'}),
+			new traffic.Car({id: 7, desiredDir: 'w'}),
+			new traffic.Car({id: 6, desiredDir: 'w'}),
+			new traffic.Car({id: 5, desiredDir: 'n'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 104.975064s.
+		Average time spent stopped by a car: 10.4975064s.
+	actuated:
+		Total time spent stopped by all cars: 92.107368s.
+		Average time spent stopped by a car: 9.2107368s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 47.48713199999995s.
+		Average time spent stopped by a car: 4.748713199999996s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 2, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 4, desiredDir: 's'}),
+			new traffic.Delay({delay: 1500}),
+			new traffic.Car({id: 3, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'w'}),
+			new traffic.Delay({delay: 5080}),
+			new traffic.Car({id: 9, desiredDir: 'e'}),
+			new traffic.Delay({delay: 100}),
+			new traffic.Car({id: 8, desiredDir: 'w'}),
+			new traffic.Delay({delay: 40}),
+			new traffic.Car({id: 7, desiredDir: 'w'}),
+			new traffic.Delay({delay: 2180}),
+			new traffic.Car({id: 6, desiredDir: 'w'}),
+			new traffic.Delay({delay: 100}),
+			new traffic.Car({id: 5, desiredDir: 'n'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 89.02378800000001s.
+		Average time spent stopped by a car: 8.902378800000003s.
+	actuated:
+		Total time spent stopped by all cars: 51.20409600000002s.
+		Average time spent stopped by a car: 5.120409600000002s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 41.77000800000003s.
+		Average time spent stopped by a car: 4.177000800000004s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 2, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 4, desiredDir: 's'}),
+			new traffic.Delay({delay: 3000}),
+			new traffic.Car({id: 3, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'w'}),
+			new traffic.Delay({delay: 20}),
+			new traffic.Car({id: 9, desiredDir: 'e'}),
+			new traffic.Delay({delay: 2920}),
+			new traffic.Car({id: 8, desiredDir: 'w'}),
+			new traffic.Delay({delay: 2130}),
+			new traffic.Car({id: 7, desiredDir: 'w'}),
+			new traffic.Delay({delay: 8730}),
+			new traffic.Car({id: 6, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1200}),
+			new traffic.Car({id: 5, desiredDir: 'n'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 117.692748s.
+		Average time spent stopped by a car: 11.7692748s.
+	actuated:
+		Total time spent stopped by all cars: 39.36981599999999s.
+		Average time spent stopped by a car: 3.9369815999999993s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 18.4181400000001s.
+		Average time spent stopped by a car: 1.84181400000001s.
+
+Test case 11:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 6, desiredDir: 's'}),
+			new traffic.Car({id: 5, desiredDir: 'e'}),
+			new traffic.Car({id: 4, desiredDir: 's'}),
+			new traffic.Car({id: 3, desiredDir: 'n'}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'e'}),
+			new traffic.Car({id: 9, desiredDir: 'e'}),
+			new traffic.Car({id: 8, desiredDir: 's'}),
+			new traffic.Car({id: 7, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 15, desiredDir: 's'}),
+			new traffic.Car({id: 14, desiredDir: 's'}),
+			new traffic.Car({id: 13, desiredDir: 'w'}),
+			new traffic.Car({id: 12, desiredDir: 'n'}),
+			new traffic.Car({id: 11, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 19, desiredDir: 'n'}),
+			new traffic.Car({id: 18, desiredDir: 'n'}),
+			new traffic.Car({id: 17, desiredDir: 'w'}),
+			new traffic.Car({id: 16, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 164.463156s.
+		Average time spent stopped by a car: 8.655955578947367s.
+	actuated:
+		Total time spent stopped by all cars: 170.51364s.
+		Average time spent stopped by a car: 8.974402105263158s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 112.509s.
+		Average time spent stopped by a car: 5.921526315789473s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 6, desiredDir: 's'}),
+			new traffic.Delay({delay: 220}),
+			new traffic.Car({id: 5, desiredDir: 'e'}),
+			new traffic.Delay({delay: 2200}),
+			new traffic.Car({id: 4, desiredDir: 's'}),
+			new traffic.Delay({delay: 4950}),
+			new traffic.Car({id: 3, desiredDir: 'n'}),
+			new traffic.Delay({delay: 20}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 110}),
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'e'}),
+			new traffic.Delay({delay: 3810}),
+			new traffic.Car({id: 9, desiredDir: 'e'}),
+			new traffic.Delay({delay: 40}),
+			new traffic.Car({id: 8, desiredDir: 's'}),
+			new traffic.Delay({delay: 650}),
+			new traffic.Car({id: 7, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 15, desiredDir: 's'}),
+			new traffic.Delay({delay: 1630}),
+			new traffic.Car({id: 14, desiredDir: 's'}),
+			new traffic.Delay({delay: 3440}),
+			new traffic.Car({id: 13, desiredDir: 'w'}),
+			new traffic.Delay({delay: 610}),
+			new traffic.Car({id: 12, desiredDir: 'n'}),
+			new traffic.Delay({delay: 320}),
+			new traffic.Car({id: 11, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 19, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1460}),
+			new traffic.Car({id: 18, desiredDir: 'n'}),
+			new traffic.Delay({delay: 970}),
+			new traffic.Car({id: 17, desiredDir: 'w'}),
+			new traffic.Delay({delay: 2070}),
+			new traffic.Car({id: 16, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 161.49625199999994s.
+		Average time spent stopped by a car: 8.499802736842103s.
+	actuated:
+		Total time spent stopped by all cars: 201.24943200000004s.
+		Average time spent stopped by a car: 10.592075368421053s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 126.72680399999999s.
+		Average time spent stopped by a car: 6.669831789473684s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 6, desiredDir: 's'}),
+			new traffic.Delay({delay: 6680}),
+			new traffic.Car({id: 5, desiredDir: 'e'}),
+			new traffic.Delay({delay: 7070}),
+			new traffic.Car({id: 4, desiredDir: 's'}),
+			new traffic.Delay({delay: 430}),
+			new traffic.Car({id: 3, desiredDir: 'n'}),
+			new traffic.Delay({delay: 710}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 110}),
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1120}),
+			new traffic.Car({id: 9, desiredDir: 'e'}),
+			new traffic.Delay({delay: 3000}),
+			new traffic.Car({id: 8, desiredDir: 's'}),
+			new traffic.Delay({delay: 4880}),
+			new traffic.Car({id: 7, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 15, desiredDir: 's'}),
+			new traffic.Delay({delay: 5550}),
+			new traffic.Car({id: 14, desiredDir: 's'}),
+			new traffic.Delay({delay: 510}),
+			new traffic.Car({id: 13, desiredDir: 'w'}),
+			new traffic.Delay({delay: 2140}),
+			new traffic.Car({id: 12, desiredDir: 'n'}),
+			new traffic.Delay({delay: 3800}),
+			new traffic.Car({id: 11, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 19, desiredDir: 'n'}),
+			new traffic.Delay({delay: 2660}),
+			new traffic.Car({id: 18, desiredDir: 'n'}),
+			new traffic.Delay({delay: 5100}),
+			new traffic.Car({id: 17, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1240}),
+			new traffic.Car({id: 16, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 163.31306400000008s.
+		Average time spent stopped by a car: 8.595424421052636s.
+	actuated:
+		Total time spent stopped by all cars: 185.74819200000005s.
+		Average time spent stopped by a car: 9.77622063157895s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 101.79147600000002s.
+		Average time spent stopped by a car: 5.3574461052631595s.
+
+Test case 12:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 1, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 5, desiredDir: 's'}),
+			new traffic.Car({id: 4, desiredDir: 'w'}),
+			new traffic.Car({id: 3, desiredDir: 'w'}),
+			new traffic.Car({id: 2, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 8, desiredDir: 's'}),
+			new traffic.Car({id: 7, desiredDir: 'n'}),
+			new traffic.Car({id: 6, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 12, desiredDir: 'w'}),
+			new traffic.Car({id: 11, desiredDir: 'n'}),
+			new traffic.Car({id: 10, desiredDir: 'w'}),
+			new traffic.Car({id: 9, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 100.291356s.
+		Average time spent stopped by a car: 8.357612999999999s.
+	actuated:
+		Total time spent stopped by all cars: 88.50708000000002s.
+		Average time spent stopped by a car: 7.375590000000001s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 67.25537999999996s.
+		Average time spent stopped by a car: 5.604614999999997s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 1, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 5, desiredDir: 's'}),
+			new traffic.Delay({delay: 3420}),
+			new traffic.Car({id: 4, desiredDir: 'w'}),
+			new traffic.Delay({delay: 230}),
+			new traffic.Car({id: 3, desiredDir: 'w'}),
+			new traffic.Delay({delay: 850}),
+			new traffic.Car({id: 2, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 8, desiredDir: 's'}),
+			new traffic.Delay({delay: 1820}),
+			new traffic.Car({id: 7, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1180}),
+			new traffic.Car({id: 6, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 12, desiredDir: 'w'}),
+			new traffic.Delay({delay: 480}),
+			new traffic.Car({id: 11, desiredDir: 'n'}),
+			new traffic.Delay({delay: 580}),
+			new traffic.Car({id: 10, desiredDir: 'w'}),
+			new traffic.Delay({delay: 3440}),
+			new traffic.Car({id: 9, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 79.05632399999999s.
+		Average time spent stopped by a car: 6.588026999999999s.
+	actuated:
+		Total time spent stopped by all cars: 109.74211200000002s.
+		Average time spent stopped by a car: 9.145176000000001s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 45.887003999999955s.
+		Average time spent stopped by a car: 3.8239169999999962s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 1, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 5, desiredDir: 's'}),
+			new traffic.Delay({delay: 420}),
+			new traffic.Car({id: 4, desiredDir: 'w'}),
+			new traffic.Delay({delay: 5400}),
+			new traffic.Car({id: 3, desiredDir: 'w'}),
+			new traffic.Delay({delay: 3180}),
+			new traffic.Car({id: 2, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 8, desiredDir: 's'}),
+			new traffic.Delay({delay: 3860}),
+			new traffic.Car({id: 7, desiredDir: 'n'}),
+			new traffic.Delay({delay: 2140}),
+			new traffic.Car({id: 6, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 12, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1810}),
+			new traffic.Car({id: 11, desiredDir: 'n'}),
+			new traffic.Delay({delay: 2770}),
+			new traffic.Car({id: 10, desiredDir: 'w'}),
+			new traffic.Delay({delay: 4420}),
+			new traffic.Car({id: 9, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 74.289276s.
+		Average time spent stopped by a car: 6.190773s.
+	actuated:
+		Total time spent stopped by all cars: 87.49033199999998s.
+		Average time spent stopped by a car: 7.290860999999998s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 31.01914799999996s.
+		Average time spent stopped by a car: 2.5849289999999963s.
+
+Test case 13:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 6, desiredDir: 'n'}),
+			new traffic.Car({id: 5, desiredDir: 's'}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 9, desiredDir: 'e'}),
+			new traffic.Car({id: 8, desiredDir: 'e'}),
+			new traffic.Car({id: 7, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 13, desiredDir: 'w'}),
+			new traffic.Car({id: 12, desiredDir: 'e'}),
+			new traffic.Car({id: 11, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 99.657972s.
+		Average time spent stopped by a car: 7.665997846153846s.
+	actuated:
+		Total time spent stopped by all cars: 86.77360800000002s.
+		Average time spent stopped by a car: 6.674892923076924s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 38.919779999999996s.
+		Average time spent stopped by a car: 2.9938292307692307s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 6, desiredDir: 'n'}),
+			new traffic.Delay({delay: 80}),
+			new traffic.Car({id: 5, desiredDir: 's'}),
+			new traffic.Delay({delay: 80}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Delay({delay: 7240}),
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Delay({delay: 80}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 20}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 9, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1780}),
+			new traffic.Car({id: 8, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1220}),
+			new traffic.Car({id: 7, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 13, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1470}),
+			new traffic.Car({id: 12, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1530}),
+			new traffic.Car({id: 11, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 88.10704799999998s.
+		Average time spent stopped by a car: 6.77746523076923s.
+	actuated:
+		Total time spent stopped by all cars: 86.80694400000003s.
+		Average time spent stopped by a car: 6.6774572307692335s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 53.03757600000003s.
+		Average time spent stopped by a car: 4.079813538461541s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 6, desiredDir: 'n'}),
+			new traffic.Delay({delay: 3950}),
+			new traffic.Car({id: 5, desiredDir: 's'}),
+			new traffic.Delay({delay: 2350}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1210}),
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Delay({delay: 2950}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 4540}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 9, desiredDir: 'e'}),
+			new traffic.Delay({delay: 3220}),
+			new traffic.Car({id: 8, desiredDir: 'e'}),
+			new traffic.Delay({delay: 2780}),
+			new traffic.Car({id: 7, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 13, desiredDir: 'w'}),
+			new traffic.Delay({delay: 4640}),
+			new traffic.Car({id: 12, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1360}),
+			new traffic.Car({id: 11, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 123.72656399999998s.
+		Average time spent stopped by a car: 9.517427999999999s.
+	actuated:
+		Total time spent stopped by all cars: 103.34160000000001s.
+		Average time spent stopped by a car: 7.949353846153848s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 63.288396000000006s.
+		Average time spent stopped by a car: 4.868338153846154s.
+
+Test case 14:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 9, desiredDir: 'n'}),
+			new traffic.Car({id: 8, desiredDir: 'e'}),
+			new traffic.Car({id: 7, desiredDir: 's'}),
+			new traffic.Car({id: 6, desiredDir: 's'}),
+			new traffic.Car({id: 5, desiredDir: 'e'}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Car({id: 3, desiredDir: 'n'}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 12, desiredDir: 'w'}),
+			new traffic.Car({id: 11, desiredDir: 's'}),
+			new traffic.Car({id: 10, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 15, desiredDir: 's'}),
+			new traffic.Car({id: 14, desiredDir: 'n'}),
+			new traffic.Car({id: 13, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 21, desiredDir: 'n'}),
+			new traffic.Car({id: 20, desiredDir: 'n'}),
+			new traffic.Car({id: 19, desiredDir: 'n'}),
+			new traffic.Car({id: 18, desiredDir: 'n'}),
+			new traffic.Car({id: 17, desiredDir: 'w'}),
+			new traffic.Car({id: 16, desiredDir: 'n'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 352.828224s.
+		Average time spent stopped by a car: 16.801344s.
+	actuated:
+		Total time spent stopped by all cars: 145.94500799999997s.
+		Average time spent stopped by a car: 6.949762285714284s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 99.624636s.
+		Average time spent stopped by a car: 4.744030285714286s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 9, desiredDir: 'n'}),
+			new traffic.Delay({delay: 740}),
+			new traffic.Car({id: 8, desiredDir: 'e'}),
+			new traffic.Delay({delay: 5080}),
+			new traffic.Car({id: 7, desiredDir: 's'}),
+			new traffic.Delay({delay: 10}),
+			new traffic.Car({id: 6, desiredDir: 's'}),
+			new traffic.Delay({delay: 610}),
+			new traffic.Car({id: 5, desiredDir: 'e'}),
+			new traffic.Delay({delay: 30}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Delay({delay: 30}),
+			new traffic.Car({id: 3, desiredDir: 'n'}),
+			new traffic.Delay({delay: 5130}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 370}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 12, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1590}),
+			new traffic.Car({id: 11, desiredDir: 's'}),
+			new traffic.Delay({delay: 1410}),
+			new traffic.Car({id: 10, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 15, desiredDir: 's'}),
+			new traffic.Delay({delay: 2450}),
+			new traffic.Car({id: 14, desiredDir: 'n'}),
+			new traffic.Delay({delay: 550}),
+			new traffic.Car({id: 13, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 21, desiredDir: 'n'}),
+			new traffic.Delay({delay: 940}),
+			new traffic.Car({id: 20, desiredDir: 'n'}),
+			new traffic.Delay({delay: 770}),
+			new traffic.Car({id: 19, desiredDir: 'n'}),
+			new traffic.Delay({delay: 90}),
+			new traffic.Car({id: 18, desiredDir: 'n'}),
+			new traffic.Delay({delay: 2760}),
+			new traffic.Car({id: 17, desiredDir: 'w'}),
+			new traffic.Delay({delay: 2940}),
+			new traffic.Car({id: 16, desiredDir: 'n'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 264.9878639999999s.
+		Average time spent stopped by a car: 12.618469714285709s.
+	actuated:
+		Total time spent stopped by all cars: 184.44808799999996s.
+		Average time spent stopped by a car: 8.783242285714284s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 122.82649199999997s.
+		Average time spent stopped by a car: 5.84888057142857s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 9, desiredDir: 'n'}),
+			new traffic.Delay({delay: 21510}),
+			new traffic.Car({id: 8, desiredDir: 'e'}),
+			new traffic.Delay({delay: 250}),
+			new traffic.Car({id: 7, desiredDir: 's'}),
+			new traffic.Delay({delay: 60}),
+			new traffic.Car({id: 6, desiredDir: 's'}),
+			new traffic.Delay({delay: 740}),
+			new traffic.Car({id: 5, desiredDir: 'e'}),
+			new traffic.Delay({delay: 90}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Delay({delay: 110}),
+			new traffic.Car({id: 3, desiredDir: 'n'}),
+			new traffic.Delay({delay: 960}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 280}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 12, desiredDir: 'w'}),
+			new traffic.Delay({delay: 2340}),
+			new traffic.Car({id: 11, desiredDir: 's'}),
+			new traffic.Delay({delay: 3660}),
+			new traffic.Car({id: 10, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 15, desiredDir: 's'}),
+			new traffic.Delay({delay: 5920}),
+			new traffic.Car({id: 14, desiredDir: 'n'}),
+			new traffic.Delay({delay: 80}),
+			new traffic.Car({id: 13, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 21, desiredDir: 'n'}),
+			new traffic.Delay({delay: 14150}),
+			new traffic.Car({id: 20, desiredDir: 'n'}),
+			new traffic.Delay({delay: 490}),
+			new traffic.Car({id: 19, desiredDir: 'n'}),
+			new traffic.Delay({delay: 70}),
+			new traffic.Car({id: 18, desiredDir: 'n'}),
+			new traffic.Delay({delay: 210}),
+			new traffic.Car({id: 17, desiredDir: 'w'}),
+			new traffic.Delay({delay: 80}),
+			new traffic.Car({id: 16, desiredDir: 'n'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 286.48958400000004s.
+		Average time spent stopped by a car: 13.642361142857144s.
+	actuated:
+		Total time spent stopped by all cars: 161.84627999999998s.
+		Average time spent stopped by a car: 7.7069657142857135s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 123.09318000000002s.
+		Average time spent stopped by a car: 5.861580000000001s.
+
+Test case 15:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 1, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 3, desiredDir: 'e'}),
+			new traffic.Car({id: 2, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 11, desiredDir: 'w'}),
+			new traffic.Car({id: 10, desiredDir: 'n'}),
+			new traffic.Car({id: 9, desiredDir: 's'}),
+			new traffic.Car({id: 8, desiredDir: 'n'}),
+			new traffic.Car({id: 7, desiredDir: 'w'}),
+			new traffic.Car({id: 6, desiredDir: 's'}),
+			new traffic.Car({id: 5, desiredDir: 'w'}),
+			new traffic.Car({id: 4, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 16, desiredDir: 'w'}),
+			new traffic.Car({id: 15, desiredDir: 'e'}),
+			new traffic.Car({id: 14, desiredDir: 'w'}),
+			new traffic.Car({id: 13, desiredDir: 'e'}),
+			new traffic.Car({id: 12, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 202.84956s.
+		Average time spent stopped by a car: 12.6780975s.
+	actuated:
+		Total time spent stopped by all cars: 149.22860399999993s.
+		Average time spent stopped by a car: 9.326787749999996s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 94.1908680000002s.
+		Average time spent stopped by a car: 5.886929250000012s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 1, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 3, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1500}),
+			new traffic.Car({id: 2, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 11, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1950}),
+			new traffic.Car({id: 10, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1220}),
+			new traffic.Car({id: 9, desiredDir: 's'}),
+			new traffic.Delay({delay: 30}),
+			new traffic.Car({id: 8, desiredDir: 'n'}),
+			new traffic.Delay({delay: 6690}),
+			new traffic.Car({id: 7, desiredDir: 'w'}),
+			new traffic.Delay({delay: 320}),
+			new traffic.Car({id: 6, desiredDir: 's'}),
+			new traffic.Delay({delay: 280}),
+			new traffic.Car({id: 5, desiredDir: 'w'}),
+			new traffic.Delay({delay: 10}),
+			new traffic.Car({id: 4, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 16, desiredDir: 'w'}),
+			new traffic.Delay({delay: 4040}),
+			new traffic.Car({id: 15, desiredDir: 'e'}),
+			new traffic.Delay({delay: 90}),
+			new traffic.Car({id: 14, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1420}),
+			new traffic.Car({id: 13, desiredDir: 'e'}),
+			new traffic.Delay({delay: 450}),
+			new traffic.Car({id: 12, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 157.76262s.
+		Average time spent stopped by a car: 9.86016375s.
+	actuated:
+		Total time spent stopped by all cars: 128.393604s.
+		Average time spent stopped by a car: 8.02460025s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 58.287996s.
+		Average time spent stopped by a car: 3.64299975s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 1, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 3, desiredDir: 'e'}),
+			new traffic.Delay({delay: 3000}),
+			new traffic.Car({id: 2, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 11, desiredDir: 'w'}),
+			new traffic.Delay({delay: 650}),
+			new traffic.Car({id: 10, desiredDir: 'n'}),
+			new traffic.Delay({delay: 2330}),
+			new traffic.Car({id: 9, desiredDir: 's'}),
+			new traffic.Delay({delay: 4300}),
+			new traffic.Car({id: 8, desiredDir: 'n'}),
+			new traffic.Delay({delay: 440}),
+			new traffic.Car({id: 7, desiredDir: 'w'}),
+			new traffic.Delay({delay: 220}),
+			new traffic.Car({id: 6, desiredDir: 's'}),
+			new traffic.Delay({delay: 12340}),
+			new traffic.Car({id: 5, desiredDir: 'w'}),
+			new traffic.Delay({delay: 720}),
+			new traffic.Car({id: 4, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 16, desiredDir: 'w'}),
+			new traffic.Delay({delay: 10}),
+			new traffic.Car({id: 15, desiredDir: 'e'}),
+			new traffic.Delay({delay: 11520}),
+			new traffic.Car({id: 14, desiredDir: 'w'}),
+			new traffic.Delay({delay: 20}),
+			new traffic.Car({id: 13, desiredDir: 'e'}),
+			new traffic.Delay({delay: 450}),
+			new traffic.Car({id: 12, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 121.326372s.
+		Average time spent stopped by a car: 7.58289825s.
+	actuated:
+		Total time spent stopped by all cars: 73.28919599999996s.
+		Average time spent stopped by a car: 4.580574749999998s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 31.519187999999936s.
+		Average time spent stopped by a car: 1.969949249999996s.
+
+Test case 16:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 9, desiredDir: 'n'}),
+			new traffic.Car({id: 8, desiredDir: 'n'}),
+			new traffic.Car({id: 7, desiredDir: 'e'}),
+			new traffic.Car({id: 6, desiredDir: 'n'}),
+			new traffic.Car({id: 5, desiredDir: 'e'}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Car({id: 1, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Car({id: 14, desiredDir: 'w'}),
+			new traffic.Car({id: 13, desiredDir: 'w'}),
+			new traffic.Car({id: 12, desiredDir: 'n'}),
+			new traffic.Car({id: 11, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 19, desiredDir: 'e'}),
+			new traffic.Car({id: 18, desiredDir: 'e'}),
+			new traffic.Car({id: 17, desiredDir: 'e'}),
+			new traffic.Car({id: 16, desiredDir: 'n'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 221.28436799999997s.
+		Average time spent stopped by a car: 11.646545684210524s.
+	actuated:
+		Total time spent stopped by all cars: 135.01079999999993s.
+		Average time spent stopped by a car: 7.105831578947365s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 44.086860000000044s.
+		Average time spent stopped by a car: 2.320361052631581s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 9, desiredDir: 'n'}),
+			new traffic.Delay({delay: 2280}),
+			new traffic.Car({id: 8, desiredDir: 'n'}),
+			new traffic.Delay({delay: 5630}),
+			new traffic.Car({id: 7, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1270}),
+			new traffic.Car({id: 6, desiredDir: 'n'}),
+			new traffic.Delay({delay: 350}),
+			new traffic.Car({id: 5, desiredDir: 'e'}),
+			new traffic.Delay({delay: 30}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Delay({delay: 40}),
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Delay({delay: 2370}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 30}),
+			new traffic.Car({id: 1, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1130}),
+			new traffic.Car({id: 14, desiredDir: 'w'}),
+			new traffic.Delay({delay: 3540}),
+			new traffic.Car({id: 13, desiredDir: 'w'}),
+			new traffic.Delay({delay: 270}),
+			new traffic.Car({id: 12, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1060}),
+			new traffic.Car({id: 11, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 19, desiredDir: 'e'}),
+			new traffic.Delay({delay: 410}),
+			new traffic.Car({id: 18, desiredDir: 'e'}),
+			new traffic.Delay({delay: 4030}),
+			new traffic.Car({id: 17, desiredDir: 'e'}),
+			new traffic.Delay({delay: 60}),
+			new traffic.Car({id: 16, desiredDir: 'n'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 211.26690000000002s.
+		Average time spent stopped by a car: 11.11931052631579s.
+	actuated:
+		Total time spent stopped by all cars: 148.69522800000007s.
+		Average time spent stopped by a car: 7.826064631578951s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 40.25322000000006s.
+		verage time spent stopped by a car: 2.1185905263157925s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 9, desiredDir: 'n'}),
+			new traffic.Delay({delay: 390}),
+			new traffic.Car({id: 8, desiredDir: 'n'}),
+			new traffic.Delay({delay: 30}),
+			new traffic.Car({id: 7, desiredDir: 'e'}),
+			new traffic.Delay({delay: 6330}),
+			new traffic.Car({id: 6, desiredDir: 'n'}),
+			new traffic.Delay({delay: 70}),
+			new traffic.Car({id: 5, desiredDir: 'e'}),
+			new traffic.Delay({delay: 60}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Delay({delay: 4300}),
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Delay({delay: 30}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 12790}),
+			new traffic.Car({id: 1, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1480}),
+			new traffic.Car({id: 14, desiredDir: 'w'}),
+			new traffic.Delay({delay: 9970}),
+			new traffic.Car({id: 13, desiredDir: 'w'}),
+			new traffic.Delay({delay: 350}),
+			new traffic.Car({id: 12, desiredDir: 'n'}),
+			new traffic.Delay({delay: 200}),
+			new traffic.Car({id: 11, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 19, desiredDir: 'e'}),
+			new traffic.Delay({delay: 880}),
+			new traffic.Car({id: 18, desiredDir: 'e'}),
+			new traffic.Delay({delay: 7890}),
+			new traffic.Car({id: 17, desiredDir: 'e'}),
+			new traffic.Delay({delay: 230}),
+			new traffic.Car({id: 16, desiredDir: 'n'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 217.81742400000002s.
+		Average time spent stopped by a car: 11.464074947368422s.
+	actuated:
+		Total time spent stopped by all cars: 39.61983600000004s.
+		Average time spent stopped by a car: 2.085254526315792s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 15.167879999999975s.
+		Average time spent stopped by a car: 0.7983094736842092s.
+
+Test case 17:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 7, desiredDir: 's'}),
+			new traffic.Car({id: 6, desiredDir: 'n'}),
+			new traffic.Car({id: 5, desiredDir: 'e'}),
+			new traffic.Car({id: 4, desiredDir: 's'}),
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 11, desiredDir: 'e'}),
+			new traffic.Car({id: 10, desiredDir: 'w'}),
+			new traffic.Car({id: 9, desiredDir: 's'}),
+			new traffic.Car({id: 8, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 16, desiredDir: 's'}),
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Car({id: 14, desiredDir: 's'}),
+			new traffic.Car({id: 13, desiredDir: 'n'}),
+			new traffic.Car({id: 12, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 19, desiredDir: 'w'}),
+			new traffic.Car({id: 18, desiredDir: 'w'}),
+			new traffic.Car({id: 17, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 183.61468800000003s.
+		Average time spent stopped by a car: 9.663930947368423s.
+	actuated:
+		Total time spent stopped by all cars: 207.03322799999995s.
+		Average time spent stopped by a car: 10.896485684210523s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 112.3756559999999s.
+		Average time spent stopped by a car: 5.914508210526311s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 7, desiredDir: 's'}),
+			new traffic.Delay({delay: 6560}),
+			new traffic.Car({id: 6, desiredDir: 'n'}),
+			new traffic.Delay({delay: 40}),
+			new traffic.Car({id: 5, desiredDir: 'e'}),
+			new traffic.Delay({delay: 410}),
+			new traffic.Car({id: 4, desiredDir: 's'}),
+			new traffic.Delay({delay: 500}),
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Delay({delay: 1140}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 350}),
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 11, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1880}),
+			new traffic.Car({id: 10, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1510}),
+			new traffic.Car({id: 9, desiredDir: 's'}),
+			new traffic.Delay({delay: 1110}),
+			new traffic.Car({id: 8, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 16, desiredDir: 's'}),
+			new traffic.Delay({delay: 30}),
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Delay({delay: 210}),
+			new traffic.Car({id: 14, desiredDir: 's'}),
+			new traffic.Delay({delay: 2500}),
+			new traffic.Car({id: 13, desiredDir: 'n'}),
+			new traffic.Delay({delay: 3260}),
+			new traffic.Car({id: 12, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 19, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1170}),
+			new traffic.Car({id: 18, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1830}),
+			new traffic.Car({id: 17, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 179.64770399999998s.
+		Average time spent stopped by a car: 9.455142315789471s.
+	actuated:
+		Total time spent stopped by all cars: 227.35152000000002s.
+		Average time spent stopped by a car: 11.965869473684211s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 129.11032800000007s.
+		Average time spent stopped by a car: 6.7952804210526345s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 7, desiredDir: 's'}),
+			new traffic.Delay({delay: 1340}),
+			new traffic.Car({id: 6, desiredDir: 'n'}),
+			new traffic.Delay({delay: 120}),
+			new traffic.Car({id: 5, desiredDir: 'e'}),
+			new traffic.Delay({delay: 980}),
+			new traffic.Car({id: 4, desiredDir: 's'}),
+			new traffic.Delay({delay: 60}),
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Delay({delay: 370}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 15130}),
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 11, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1210}),
+			new traffic.Car({id: 10, desiredDir: 'w'}),
+			new traffic.Delay({delay: 230}),
+			new traffic.Car({id: 9, desiredDir: 's'}),
+			new traffic.Delay({delay: 7560}),
+			new traffic.Car({id: 8, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 16, desiredDir: 's'}),
+			new traffic.Delay({delay: 4830}),
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Delay({delay: 200}),
+			new traffic.Car({id: 14, desiredDir: 's'}),
+			new traffic.Delay({delay: 6760}),
+			new traffic.Car({id: 13, desiredDir: 'n'}),
+			new traffic.Delay({delay: 210}),
+			new traffic.Car({id: 12, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 19, desiredDir: 'w'}),
+			new traffic.Delay({delay: 4800}),
+			new traffic.Car({id: 18, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1200}),
+			new traffic.Car({id: 17, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 187.24831199999997s.
+		Average time spent stopped by a car: 9.855174315789473s.
+	actuated:
+		Total time spent stopped by all cars: 193.6321559999999s.
+		Average time spent stopped by a car: 10.191166105263154s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 74.03925600000008s.
+		Average time spent stopped by a car: 3.8968029473684256s.
+
+Test case 18:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 5, desiredDir: 'w'}),
+			new traffic.Car({id: 4, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'w'}),
+			new traffic.Car({id: 9, desiredDir: 'n'}),
+			new traffic.Car({id: 8, desiredDir: 'n'}),
+			new traffic.Car({id: 7, desiredDir: 'w'}),
+			new traffic.Car({id: 6, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 14, desiredDir: 'n'}),
+			new traffic.Car({id: 13, desiredDir: 'n'}),
+			new traffic.Car({id: 12, desiredDir: 'w'}),
+			new traffic.Car({id: 11, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 106.975224s.
+		Average time spent stopped by a car: 7.641087428571429s.
+	actuated:
+		Total time spent stopped by all cars: 111.30890400000008s.
+		Average time spent stopped by a car: 7.950636000000006s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 69.10552799999999s.
+		Average time spent stopped by a car: 4.936109142857142s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Delay({delay: 20}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 2980}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 5, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1500}),
+			new traffic.Car({id: 4, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'w'}),
+			new traffic.Delay({delay: 2900}),
+			new traffic.Car({id: 9, desiredDir: 'n'}),
+			new traffic.Delay({delay: 780}),
+			new traffic.Car({id: 8, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1610}),
+			new traffic.Car({id: 7, desiredDir: 'w'}),
+			new traffic.Delay({delay: 710}),
+			new traffic.Car({id: 6, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 14, desiredDir: 'n'}),
+			new traffic.Delay({delay: 250}),
+			new traffic.Car({id: 13, desiredDir: 'n'}),
+			new traffic.Delay({delay: 3180}),
+			new traffic.Car({id: 12, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1070}),
+			new traffic.Car({id: 11, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 167.18004s.
+		Average time spent stopped by a car: 11.941431428571427s.
+	actuated:
+		Total time spent stopped by all cars: 136.944288s.
+		Average time spent stopped by a car: 9.781734857142858s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 73.88924399999992s.
+		Average time spent stopped by a car: 5.277803142857136s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 3, desiredDir: 's'}),
+			new traffic.Delay({delay: 4690}),
+			new traffic.Car({id: 2, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1310}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 5, desiredDir: 'w'}),
+			new traffic.Delay({delay: 3000}),
+			new traffic.Car({id: 4, desiredDir: 'w'})
+		],
+		[
+			new traffic.Car({id: 10, desiredDir: 'w'}),
+			new traffic.Delay({delay: 940}),
+			new traffic.Car({id: 9, desiredDir: 'n'}),
+			new traffic.Delay({delay: 6410}),
+			new traffic.Car({id: 8, desiredDir: 'n'}),
+			new traffic.Delay({delay: 500}),
+			new traffic.Car({id: 7, desiredDir: 'w'}),
+			new traffic.Delay({delay: 4150}),
+			new traffic.Car({id: 6, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 14, desiredDir: 'n'}),
+			new traffic.Delay({delay: 3360}),
+			new traffic.Car({id: 13, desiredDir: 'n'}),
+			new traffic.Delay({delay: 2040}),
+			new traffic.Car({id: 12, desiredDir: 'w'}),
+			new traffic.Delay({delay: 3600}),
+			new traffic.Car({id: 11, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 180.93114000000003s.
+		Average time spent stopped by a car: 12.923652857142859s.
+	actuated:
+		Total time spent stopped by all cars: 158.546016s.
+		Average time spent stopped by a car: 11.32471542857143s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 56.221164000000016s.
+		Average time spent stopped by a car: 4.01579742857143s.
+
+Test case 19:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 3, desiredDir: 'e'}),
+			new traffic.Car({id: 2, desiredDir: 'n'}),
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 5, desiredDir: 'w'}),
+			new traffic.Car({id: 4, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 9, desiredDir: 's'}),
+			new traffic.Car({id: 8, desiredDir: 'n'}),
+			new traffic.Car({id: 7, desiredDir: 'n'}),
+			new traffic.Car({id: 6, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 12, desiredDir: 'n'}),
+			new traffic.Car({id: 11, desiredDir: 'n'}),
+			new traffic.Car({id: 10, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 113.275728s.
+		Average time spent stopped by a car: 9.439644s.
+	actuated:
+		Total time spent stopped by all cars: 60.33815999999999s.
+		Average time spent stopped by a car: 5.028179999999999s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 41.36997599999998s.
+		Average time spent stopped by a car: 3.447497999999998s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 3, desiredDir: 'e'}),
+			new traffic.Delay({delay: 2790}),
+			new traffic.Car({id: 2, desiredDir: 'n'}),
+			new traffic.Delay({delay: 210}),
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 5, desiredDir: 'w'}),
+			new traffic.Delay({delay: 1500}),
+			new traffic.Car({id: 4, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 9, desiredDir: 's'}),
+			new traffic.Delay({delay: 2560}),
+			new traffic.Car({id: 8, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1750}),
+			new traffic.Car({id: 7, desiredDir: 'n'}),
+			new traffic.Delay({delay: 190}),
+			new traffic.Car({id: 6, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 12, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1430}),
+			new traffic.Car({id: 11, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1570}),
+			new traffic.Car({id: 10, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 120.826332s.
+		Average time spent stopped by a car: 10.068860999999998s.
+	actuated:
+		Total time spent stopped by all cars: 75.42269999999999s.
+		Average time spent stopped by a car: 6.285225s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 56.40451200000002s.
+		Average time spent stopped by a car: 4.700376000000001s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 3, desiredDir: 'e'}),
+			new traffic.Delay({delay: 670}),
+			new traffic.Car({id: 2, desiredDir: 'n'}),
+			new traffic.Delay({delay: 5330}),
+			new traffic.Car({id: 1, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 5, desiredDir: 'w'}),
+			new traffic.Delay({delay: 3000}),
+			new traffic.Car({id: 4, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 9, desiredDir: 's'}),
+			new traffic.Delay({delay: 1260}),
+			new traffic.Car({id: 8, desiredDir: 'n'}),
+			new traffic.Delay({delay: 7280}),
+			new traffic.Car({id: 7, desiredDir: 'n'}),
+			new traffic.Delay({delay: 460}),
+			new traffic.Car({id: 6, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 12, desiredDir: 'n'}),
+			new traffic.Delay({delay: 4640}),
+			new traffic.Car({id: 11, desiredDir: 'n'}),
+			new traffic.Delay({delay: 1360}),
+			new traffic.Car({id: 10, desiredDir: 'e'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 117.309384s.
+		Average time spent stopped by a car: 9.775782s.
+	actuated:
+		Total time spent stopped by all cars: 89.640504s.
+		Average time spent stopped by a car: 7.470042s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 55.32109199999996s.
+		Average time spent stopped by a car: 4.610090999999997s.
+
+Test case 20:
+
+heavy:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 9, desiredDir: 'n'}),
+			new traffic.Car({id: 8, desiredDir: 'n'}),
+			new traffic.Car({id: 7, desiredDir: 'e'}),
+			new traffic.Car({id: 6, desiredDir: 'e'}),
+			new traffic.Car({id: 5, desiredDir: 'n'}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Car({id: 3, desiredDir: 'n'}),
+			new traffic.Car({id: 2, desiredDir: 's'}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Car({id: 14, desiredDir: 'e'}),
+			new traffic.Car({id: 13, desiredDir: 'e'}),
+			new traffic.Car({id: 12, desiredDir: 's'}),
+			new traffic.Car({id: 11, desiredDir: 'w'}),
+			new traffic.Car({id: 10, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 18, desiredDir: 's'}),
+			new traffic.Car({id: 17, desiredDir: 'n'}),
+			new traffic.Car({id: 16, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 19, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 289.93986000000007s.
+		Average time spent stopped by a car: 15.25999263157895s.
+	actuated:
+		Total time spent stopped by all cars: 195.315624s.
+		Average time spent stopped by a car: 10.279769684210526s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 146.5950599999999s.
+		Average time spent stopped by a car: 7.715529473684206s.
+medium:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 9, desiredDir: 'n'}),
+			new traffic.Delay({delay: 50}),
+			new traffic.Car({id: 8, desiredDir: 'n'}),
+			new traffic.Delay({delay: 40}),
+			new traffic.Car({id: 7, desiredDir: 'e'}),
+			new traffic.Delay({delay: 2590}),
+			new traffic.Car({id: 6, desiredDir: 'e'}),
+			new traffic.Delay({delay: 20}),
+			new traffic.Car({id: 5, desiredDir: 'n'}),
+			new traffic.Delay({delay: 90}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Delay({delay: 10}),
+			new traffic.Car({id: 3, desiredDir: 'n'}),
+			new traffic.Delay({delay: 140}),
+			new traffic.Car({id: 2, desiredDir: 's'}),
+			new traffic.Delay({delay: 9060}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Delay({delay: 6540}),
+			new traffic.Car({id: 14, desiredDir: 'e'}),
+			new traffic.Delay({delay: 10}),
+			new traffic.Car({id: 13, desiredDir: 'e'}),
+			new traffic.Delay({delay: 60}),
+			new traffic.Car({id: 12, desiredDir: 's'}),
+			new traffic.Delay({delay: 250}),
+			new traffic.Car({id: 11, desiredDir: 'w'}),
+			new traffic.Delay({delay: 640}),
+			new traffic.Car({id: 10, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 18, desiredDir: 's'}),
+			new traffic.Delay({delay: 2170}),
+			new traffic.Car({id: 17, desiredDir: 'n'}),
+			new traffic.Delay({delay: 830}),
+			new traffic.Car({id: 16, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 19, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 218.18412000000006s.
+		Average time spent stopped by a car: 11.483374736842109s.
+	actuated:
+		Total time spent stopped by all cars: 124.62663600000002s.
+		Average time spent stopped by a car: 6.559296631578948s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 119.10952799999993s.
+		Average time spent stopped by a car: 6.2689225263157855s.
+light:
+	let carPlacements = [
+		[
+			new traffic.Car({id: 9, desiredDir: 'n'}),
+			new traffic.Delay({delay: 50}),
+			new traffic.Car({id: 8, desiredDir: 'n'}),
+			new traffic.Delay({delay: 110}),
+			new traffic.Car({id: 7, desiredDir: 'e'}),
+			new traffic.Delay({delay: 10}),
+			new traffic.Car({id: 6, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1070}),
+			new traffic.Car({id: 5, desiredDir: 'n'}),
+			new traffic.Delay({delay: 350}),
+			new traffic.Car({id: 4, desiredDir: 'n'}),
+			new traffic.Delay({delay: 14040}),
+			new traffic.Car({id: 3, desiredDir: 'n'}),
+			new traffic.Delay({delay: 3560}),
+			new traffic.Car({id: 2, desiredDir: 's'}),
+			new traffic.Delay({delay: 4810}),
+			new traffic.Car({id: 1, desiredDir: 'n'})
+		],
+		[
+			new traffic.Car({id: 15, desiredDir: 'w'}),
+			new traffic.Delay({delay: 20}),
+			new traffic.Car({id: 14, desiredDir: 'e'}),
+			new traffic.Delay({delay: 11810}),
+			new traffic.Car({id: 13, desiredDir: 'e'}),
+			new traffic.Delay({delay: 1860}),
+			new traffic.Car({id: 12, desiredDir: 's'}),
+			new traffic.Delay({delay: 820}),
+			new traffic.Car({id: 11, desiredDir: 'w'}),
+			new traffic.Delay({delay: 490}),
+			new traffic.Car({id: 10, desiredDir: 'e'})
+		],
+		[
+			new traffic.Car({id: 18, desiredDir: 's'}),
+			new traffic.Delay({delay: 3530}),
+			new traffic.Car({id: 17, desiredDir: 'n'}),
+			new traffic.Delay({delay: 2470}),
+			new traffic.Car({id: 16, desiredDir: 's'})
+		],
+		[
+			new traffic.Car({id: 19, desiredDir: 'w'})
+		]
+	]
+	pre-timed:
+		Total time spent stopped by all cars: 250.80339600000005s.
+		Average time spent stopped by a car: 13.200178736842107s.
+	actuated:
+		Total time spent stopped by all cars: 109.29207600000001s.
+		Average time spent stopped by a car: 5.7522145263157896s.
+	geolocation-enabled:
+		Total time spent stopped by all cars: 60.93820800000016s.
+		Average time spent stopped by a car: 3.207274105263166s.
