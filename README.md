@@ -2,7 +2,7 @@
 
 This repository contains simulation software which compares pre-timed, fully-actuated, and geolocation-enabled intersections.
 
-The geolocation-enabled algorithm is a custom made and shows an improvement of 57.76% over pre-timed intersections.
+The geolocation-enabled algorithm is custom made and shows an improvement of 57.76% over pre-timed intersections.
 
 ## Running the Project
 
@@ -18,9 +18,9 @@ You may also see any lint errors in the console.
 
 ## Customising the test cases
 
-By default, the project will run with randomised demand & pre-timed mode with medium density gaps in the placement of vehicles.
+By default, the project will run with randomised demand & pre-timed mode with medium density gaps when placing vehicles.
 
-To customise this functionality, go into the App.js file(line 250) and:
+To customise this functionality, go into the src/App.js file(line 250) and:
 
 - uncomment the carPlacements block
 - comment out the generateCarPlacements
