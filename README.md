@@ -8,6 +8,8 @@ The geolocation-enabled algorithm is custom made and shows an improvement of 57.
 
 ### `cd traffic-management-simulation`
 
+### `npm install`
+
 ### `npm start`
 
 Runs the app in the development mode.\
